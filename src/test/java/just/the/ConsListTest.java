@@ -3,6 +3,7 @@ package just.the;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -98,5 +99,17 @@ public class ConsListTest {
         assertThat(t)
             .isExactlyInstanceOf(NullPointerException.class)
             .hasMessage("tail is null");
+    }
+
+    @Test
+    public void exhaustedIterator_next_throwsNoSuchElement() {
+        ConsList<Boolean> list = list(true, false);
+        Iterator<Boolean> iter = list.iterator();
+        assertThat(iter.next()).isTrue();
+        assertThat(iter.next()).isFalse();
+        Throwable t = catchThrowable(iter::next);
+        assertThat(t)
+            .isExactlyInstanceOf(NoSuchElementException.class)
+            .hasNoCause();
     }
 }
