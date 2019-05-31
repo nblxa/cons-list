@@ -31,6 +31,7 @@ public class ConsListTest {
         ConsList<Integer> list = nil();
         list = cons(42, list);
         assertThat(list).hasSize(1);
+        assertThat(list.size()).isEqualTo(1);
         assertThat(list.head()).isEqualTo(42);
         assertThat(list.tail()).isEmpty();
     }
@@ -42,6 +43,7 @@ public class ConsListTest {
         assertThat(list)
             .hasSize(2)
             .containsExactly(42, 100500);
+        assertThat(list.size()).isEqualTo(2);
         assertThat(list.head()).isEqualTo(42);
         assertThat(list.tail()).containsExactly(100500);
     }
@@ -88,5 +90,13 @@ public class ConsListTest {
     public void reverse() {
         ConsList<String> strings = list("Apples", "Bananas", "Oranges");
         assertThat(strings.reverse()).containsExactly("Oranges", "Bananas", "Apples");
+    }
+
+    @Test
+    public void cons_withNullTail_throwsException() {
+        Throwable t = catchThrowable(() -> cons("Peaches", null));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasMessage("tail is null");
     }
 }
