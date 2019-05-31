@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/nblxa/just-the-cons-list.svg?branch=master)](https://travis-ci.com/nblxa/just-the-cons-list)
+
 # Just the Cons List and nothing more
 
 The ultimate thread-safe and immutable
