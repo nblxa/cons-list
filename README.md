@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/nblxa/just-the-cons-list/badge.svg?branch=master)](https://coveralls.io/github/nblxa/just-the-cons-list?branch=master)
+[![Build Status](https://travis-ci.com/nblxa/just-the-cons-list.svg?branch=master)](https://travis-ci.com/nblxa/just-the-cons-list) [![Coverage Status](https://coveralls.io/repos/github/nblxa/just-the-cons-list/badge.svg?branch=master)](https://coveralls.io/github/nblxa/just-the-cons-list?branch=master)
 
 # Just the Cons List and nothing more
 
@@ -14,7 +14,7 @@ abort with a `StackOverflowError`.
 Cons List, due to its immutability, is an ideal data structure
 for multi-threaded processing of ordered collections of data.
 
-## Building
+## Build
 
 Linux/MacOS:
 ```bash
@@ -28,7 +28,7 @@ Windows:
 
 ## Usage
 
-Static imports for easy use:
+Static imports for ease of use:
 
 ```java
 import static just.the.ConsList.*;
