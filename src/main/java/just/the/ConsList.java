@@ -4,44 +4,108 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * The ultimate immutable and thread-safe Cons List that implements {@link java.util.Collection}
  * and does not consume the stack.
  *
+ * <p>Usage:
+ *
+ * <pre>
+ * import static just.the.ConsList.*;
+ * ...
+ * ConsList&lt;String&gt; list = list(&quot;Apples&quot;, &quot;Oranges&quot;, &quot;Bananas&quot;);
+ * list.forEach(fruit -> System.out.println(&quot;I like &quot; + fruit);</pre>
+ *
  * @param <E> element type
  */
 @Immutable
 @ThreadSafe
-public final class ConsList<E> implements Collection<E> {
-    private static ConsList NIL = new ConsList<Void>(null, null, 0);
+public final class ConsList<E> extends AbstractCollection<E> {
+    private static final ConsList NIL = new ConsList<Void>(null, null, 0);
 
+    /**
+     * Returns the empty cons list.
+     *
+     * The result is a singleton instance shared by all empty cons lists.
+     *
+     * @param <T> element type
+     * @return singleton empty list
+     */
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T> ConsList<T> nil() {
         return (ConsList<T>) NIL;
     }
 
+    /**
+     * Constructs a new cons list with elements <tt>head</tt> and <tt>tail</tt>.
+     *
+     * <p>The head, the tail elements and the resulting list have the same compile-time type.
+     *
+     * <p>The original list is not modified.
+     *
+     * @param head  first element of the new list
+     * @param tail  sublist of second and consecutive elements of the new list
+     * @param <V>   element type
+     * @return      a cons list with the given head and tail elements
+     */
     @NonNull
-    public static <V> ConsList<V> cons(V head) {
-        return new ConsList<>(head, nil(), 1);
+    public static <V> ConsList<V> cons(V head, @NonNull ConsList<V> tail) {
+        return new ConsList<>(head, Objects.requireNonNull(tail, "tail is null"),
+            tail.size + 1);
     }
 
-    @NonNull
-    public static <V> ConsList<V> cons(V head, ConsList<V> tail) {
-        return new ConsList<>(head, tail, tail.size + 1);
-    }
-
+    /**
+     * Constructs a new cons list of element type <tt>klass</tt> with elements <tt>head</tt>
+     * and <tt>tail</tt>.
+     *
+     * <p>The head, the tail elements and the resulting list have the same compile-time type
+     * defined by the parameter <tt>klass</tt>. This type must be the common supertype
+     * of both the new head element and the elements of the tail. The parameter is required
+     * to overcome the deficiencies of the Java generics and type inference.
+     *
+     * <p>This works without the explicit type parameter:
+     * <pre>ConsList&apos;Number&apos; l = cons(3.14d, cons(10, nil()));</pre>
+     *
+     * <p>But this requires it:
+     * <pre>ConsList&apos;Integer&apos; l = cons(10, nil());
+     *     ConsList&apos;Number&apos; l = cons(3.14d, i, Number.class);</pre>
+     *
+     * <p>The original list is not modified.
+     *
+     * @param head  first element of the new list
+     * @param tail  sublist of second and consecutive elements of the new list
+     * @param klass type-evidence parameter, unused at runtime, and only required
+     *              to provide static type binding at compile-time
+     * @param <V>   element type of the resulting list: base class of both <tt>head</tt>
+     *              and elements of <tt>tail</tt>
+     * @param <U>   element type of the new list&apos;s head
+     * @return      a cons list with the given head and tail elements and of given element type
+     */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <V, U extends V> ConsList<V> cons(U head, ConsList<? extends V> tail, Class<V> klass) {
-        return (ConsList<V>) new ConsList(head, tail, tail.size + 1);
+    public static <V, U extends V> ConsList<V> cons(U head, @NonNull ConsList<? extends V> tail,
+                                                    @NonNull Class<V> klass) {
+        return (ConsList<V>) new ConsList(head,
+            Objects.requireNonNull(tail, "tail is null"),
+            tail.size + 1);
     }
 
+    /**
+     * Constructs a new cons list containing elements in the given order.
+     *
+     * <p>An invocation with an empty parameter list will produce the empty
+     * list instance <tt>nil()</tt>.
+     *
+     * <p>With a non-empty parameter array, its first element is the head of the new cons list,
+     * the rest are the parameters for constructing its tail.
+     *
+     * @param elements  any number of elements of the list to be constructed
+     * @param <V>       element type
+     * @return          the cons list with
+     */
     @NonNull
     @SafeVarargs
     public static <V> ConsList<V> list(V... elements) {
@@ -89,95 +153,34 @@ public final class ConsList<E> implements Collection<E> {
         return result;
     }
 
+    @Override
     public int size() {
         return size;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    public boolean contains(Object o) {
-        ConsList<E> target = this;
-        while (target.tail != null) {
-            if (Objects.equals(o, target.head)) {
-                return true;
-            }
-            target = target.tail;
-        }
-        return false;
-    }
-
     @NonNull
+    @Override
     public Iterator<E> iterator() {
         return new ConsIterator<>(this);
     }
 
-    @NonNull
-    public Object[] toArray() {
-        Object[] array = new Object[size];
-        ConsList<E> target = this;
-        int i = 0;
-        while (target.tail != null) {
-            array[i] = target.head;
-            i++;
-            target = target.tail;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        return array;
-    }
-
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T1> T1[] toArray(T1[] a) {
-        if (a.length >= size) {
-            ConsList<E> target = this;
-            int i = 0;
-            while (target.tail != null) {
-                try {
-                    a[i] = (T1) target.head;
-                } catch (ClassCastException cce) {
-                    throw new ArrayStoreException();
-                }
-                i++;
-                target = target.tail;
-            }
-
-            return a;
+        if (!(o instanceof ConsList)) {
+            return false;
         }
-        return (T1[]) toArray();
+        ConsList<?> consList = (ConsList<?>) o;
+        return size == consList.size &&
+            Objects.equals(head, consList.head) &&
+            Objects.equals(tail, consList.tail);
     }
 
-    public boolean add(E e) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean remove(Object o) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean containsAll(Collection<?> c) {
-        for (Object o: c) {
-            if (!contains(o)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean addAll(Collection<? extends E> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void clear() {
-        throw new UnsupportedOperationException();
+    @Override
+    public int hashCode() {
+        return Objects.hash(head, tail, size);
     }
 
     private static final class ConsIterator<E> implements Iterator<E> {
