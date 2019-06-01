@@ -60,14 +60,18 @@ public class ConsListTest {
     @Test
     public void cons_withTypeInference() {
         ConsList<Number> n = cons(3.14d, cons(10, nil()));
-        assertThat(n).containsExactly(3.14d, 10);
+        assertThat(n)
+            .containsExactly(3.14d, 10)
+            .hasSize(2);
     }
 
     @Test
     public void cons_withExplicitType() {
         ConsList<Integer> i = cons(10, nil());
         ConsList<Number> n = cons(3.14d, i, Number.class);
-        assertThat(n).containsExactly(3.14d, 10);
+        assertThat(n)
+            .containsExactly(3.14d, 10)
+            .hasSize(2);
     }
 
     @Test

@@ -5,6 +5,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * The ultimate immutable and thread-safe Cons List that implements {@link java.util.Collection}
@@ -23,7 +25,7 @@ import java.util.*;
 @Immutable
 @ThreadSafe
 public final class ConsList<E> extends AbstractCollection<E> {
-    private static final ConsList NIL = new ConsList<Void>(null, null, 0);
+    private static final ConsList NIL = new ConsList<Void>(null, null);
 
     /**
      * Returns the empty cons list.
@@ -53,8 +55,7 @@ public final class ConsList<E> extends AbstractCollection<E> {
      */
     @NonNull
     public static <V> ConsList<V> cons(V head, @NonNull ConsList<V> tail) {
-        return new ConsList<>(head, Objects.requireNonNull(tail, "tail is null"),
-            tail.size + 1);
+        return new ConsList<>(head, Objects.requireNonNull(tail, "tail is null"));
     }
 
     /**
@@ -85,12 +86,11 @@ public final class ConsList<E> extends AbstractCollection<E> {
      * @return      a cons list with the given head and tail elements and of given element type
      */
     @NonNull
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unused"})
     public static <V, U extends V> ConsList<V> cons(U head, @NonNull ConsList<? extends V> tail,
                                                     @NonNull Class<V> klass) {
         return (ConsList<V>) new ConsList(head,
-            Objects.requireNonNull(tail, "tail is null"),
-            tail.size + 1);
+            Objects.requireNonNull(tail, "tail is null"));
     }
 
     /**
@@ -109,21 +109,19 @@ public final class ConsList<E> extends AbstractCollection<E> {
     @NonNull
     @SafeVarargs
     public static <V> ConsList<V> list(V... elements) {
-        ConsList<V> target = nil();
+        ConsList<V> cons = nil();
         for (int i = elements.length - 1; i >= 0; i--) {
-            target = cons(elements[i], target);
+            cons = cons(elements[i], cons);
         }
-        return target;
+        return cons;
     }
 
     private final E head;
     private final ConsList<E> tail;
-    private final int size;
 
-    private ConsList(E head, ConsList<E> tail, int size) {
+    private ConsList(E head, ConsList<E> tail) {
         this.tail = tail;
         this.head = head;
-        this.size = size;
     }
 
     @NonNull
@@ -145,16 +143,22 @@ public final class ConsList<E> extends AbstractCollection<E> {
     @NonNull
     public ConsList<E> reverse() {
         ConsList<E> result = nil();
-        ConsList<E> target = this;
-        while (target.tail != null) {
-            result = cons(target.head, result);
-            target = target.tail;
+        ConsList<E> cons = this;
+        while (cons.tail != null) {
+            result = cons(cons.head, result);
+            cons = cons.tail;
         }
         return result;
     }
 
     @Override
     public int size() {
+        int size = 0;
+        ConsList<E> cons = this;
+        while (cons.tail != null) {
+            size++;
+            cons = cons.tail;
+        }
         return size;
     }
 
@@ -162,6 +166,13 @@ public final class ConsList<E> extends AbstractCollection<E> {
     @Override
     public Iterator<E> iterator() {
         return new ConsIterator<>(this);
+    }
+
+    @NonNull
+    @Override
+    public Stream<E> stream() {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+            iterator(), Spliterator.IMMUTABLE), false);
     }
 
     @Override
@@ -173,35 +184,34 @@ public final class ConsList<E> extends AbstractCollection<E> {
             return false;
         }
         ConsList<?> consList = (ConsList<?>) o;
-        return size == consList.size &&
-            Objects.equals(head, consList.head) &&
+        return Objects.equals(head, consList.head) &&
             Objects.equals(tail, consList.tail);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(head, tail, size);
+        return Objects.hash(head, tail);
     }
 
     private static final class ConsIterator<E> implements Iterator<E> {
-        private ConsList<E> target;
+        private ConsList<E> cons;
 
-        private ConsIterator(ConsList<E> target) {
-            this.target = target;
+        private ConsIterator(ConsList<E> cons) {
+            this.cons = cons;
         }
 
         @Override
         public boolean hasNext() {
-            return target.tail != null;
+            return cons.tail != null;
         }
 
         @Override
         public E next() {
-            if (target.tail == null) {
+            if (cons.tail == null) {
                 throw new NoSuchElementException();
             }
-            E next = target.head;
-            target = target.tail;
+            E next = cons.head;
+            cons = cons.tail;
             return next;
         }
     }
