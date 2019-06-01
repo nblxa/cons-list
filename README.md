@@ -1,30 +1,38 @@
-[![Build Status](https://travis-ci.com/nblxa/just-the-cons-list.svg?branch=master)](https://travis-ci.com/nblxa/just-the-cons-list) [![Coverage Status](https://coveralls.io/repos/github/nblxa/just-the-cons-list/badge.svg?branch=master)](https://coveralls.io/github/nblxa/just-the-cons-list?branch=master)
+[![Build Status](https://travis-ci.com/nblxa/just-the-cons-list.svg?branch=master)](https://travis-ci.com/nblxa/just-the-cons-list)
+[![Coverage Status](https://coveralls.io/repos/github/nblxa/just-the-cons-list/badge.svg?branch=master)](https://coveralls.io/github/nblxa/just-the-cons-list?branch=master)
 
-# Just the Cons List and nothing more
+# Just the Cons List and nothing else
 
-The ultimate thread-safe and immutable
-[Cons List](https://en.wikipedia.org/wiki/Cons) implementation in Java
-that satisfies the `java.util.Collection` interface, giving the access
-to all its methods such as `stream()` that further provides monadic
-operations on the list.
+This repository contains just one Java class of production code:
+[ConsList.java](src/main/java/just/the/ConsList.java).
 
-This implementation of Cons List does not use recursion, so it will not
-abort with a `StackOverflowError`.
+It is the ultimate thread-safe and immutable Cons List implementation
+in Java that satisfies the `java.util.Collection` interface, giving
+the programmers the access to all its methods such as `stream()`,
+`toString()` and others.
 
-Cons List, due to its immutability, is an ideal data structure
-for multi-threaded processing of ordered collections of data.
+This implementation of Cons List does not use recursion, so it will
+not cause a `StackOverflowError`. A list is allowed to contain more
+than `Integer.MAX_VALUE` elements and will produce an overhead of two
+object references per element.
 
-## Build
+Collection methods are implemented:
+* `size()` iterates through the list and correctly handles lists with
+  more than `Integer.MAX_VALUE` elements.
+* `isEmpty()` does not try to calculate the size to see if it is 0.
+* `spliterator()` correctly assumes no information about the size and
+  knows the collection is immutable.
 
-Linux/MacOS:
-```bash
-./mvnw clean install
-```
+Methods `equals(Object o)` and `hashCode()` are also implemented
+without recursion.
 
-Windows:
-```cmd
-.\mvnw.cmd clean install
-```
+Cons List, due to its simplicity and immutability, is an ideal data
+structure for multi-threaded processing of ordered collections of data.
+Direct implementations however, suffer from heavy recsive calls
+and may cause high stack memory consumption, if not more severe issues.
+This implementation fuses the power of the immutable cons list
+with the wide range of functionality offered by the Java Collections
+and Streams API.
 
 ## Usage
 
@@ -45,4 +53,3 @@ Create a list of an arbitrary length:
 ```java
 Collection<String> strings = list("Hello", "functional", "programming", "!");
 ```
-

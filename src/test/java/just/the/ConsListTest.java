@@ -1,6 +1,8 @@
 package just.the;
 
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,7 +18,9 @@ public class ConsListTest {
     @Test
     public void nil_isEmpty() {
         ConsList<Void> empty = nil();
-        assertThat(empty).isEmpty();
+        assertThat(empty)
+            .hasSize(0)
+            .isEmpty();
         Throwable t = catchThrowable(empty::head);
         assertThat(t)
             .isExactlyInstanceOf(NoSuchElementException.class)
@@ -31,8 +35,9 @@ public class ConsListTest {
     public void nil_consElement_yieldsSize1() {
         ConsList<Integer> list = nil();
         list = cons(42, list);
-        assertThat(list).hasSize(1);
-        assertThat(list.size()).isEqualTo(1);
+        assertThat(list)
+            .hasSize(1)
+            .isNotEmpty();
         assertThat(list.head()).isEqualTo(42);
         assertThat(list.tail()).isEmpty();
     }
@@ -43,8 +48,8 @@ public class ConsListTest {
         list = cons(42, list);
         assertThat(list)
             .hasSize(2)
+            .isNotEmpty()
             .containsExactly(42, 100500);
-        assertThat(list.size()).isEqualTo(2);
         assertThat(list.head()).isEqualTo(42);
         assertThat(list.tail()).containsExactly(100500);
     }
@@ -62,7 +67,8 @@ public class ConsListTest {
         ConsList<Number> n = cons(3.14d, cons(10, nil()));
         assertThat(n)
             .containsExactly(3.14d, 10)
-            .hasSize(2);
+            .hasSize(2)
+            .isNotEmpty();
     }
 
     @Test
@@ -71,7 +77,8 @@ public class ConsListTest {
         ConsList<Number> n = cons(3.14d, i, Number.class);
         assertThat(n)
             .containsExactly(3.14d, 10)
-            .hasSize(2);
+            .hasSize(2)
+            .isNotEmpty();
     }
 
     @Test
@@ -115,5 +122,20 @@ public class ConsListTest {
         assertThat(t)
             .isExactlyInstanceOf(NoSuchElementException.class)
             .hasNoCause();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void hugeList_hasSizeIntMaxValue() {
+        ConsList<Integer> bs = cons(3, cons(2, cons(1, nil())));
+
+        ConsList<Integer> spyCons = Mockito.spy(bs);
+        Mockito.doReturn(Integer.MAX_VALUE - 1)
+            .when(spyCons)
+            .nilSize();
+
+        assertThat(spyCons)
+            .isNotEmpty()
+            .hasSize(Integer.MAX_VALUE);
     }
 }

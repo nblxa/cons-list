@@ -5,8 +5,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * The ultimate immutable and thread-safe Cons List that implements {@link java.util.Collection}
@@ -24,7 +22,7 @@ import java.util.stream.StreamSupport;
  */
 @Immutable
 @ThreadSafe
-public final class ConsList<E> extends AbstractCollection<E> {
+public class ConsList<E> extends AbstractCollection<E> {
     private static final ConsList NIL = new ConsList<Void>(null, null);
 
     /**
@@ -124,6 +122,13 @@ public final class ConsList<E> extends AbstractCollection<E> {
         this.head = head;
     }
 
+    /**
+     * Returns the first element of the cons list.
+     *
+     * <p>Throws {@link NoSuchElementException} if the list is empty.
+     *
+     * @return first element of the cons list
+     */
     @NonNull
     public E head() {
         if (tail == null) {
@@ -132,6 +137,13 @@ public final class ConsList<E> extends AbstractCollection<E> {
         return head;
     }
 
+    /**
+     * Returns another cons list containing the current list&apos;s elements after the first one.
+     *
+     * <p>Throws {@link NoSuchElementException} if the list is empty.
+     *
+     * @return elements of the cons list after the first one
+     */
     @NonNull
     public ConsList<E> tail() {
         if (tail == null) {
@@ -140,6 +152,11 @@ public final class ConsList<E> extends AbstractCollection<E> {
         return tail;
     }
 
+    /**
+     * Constructs a new cons list with the elements of the current one in the reverse order.
+     *
+     * @return a new cons list with elements in reversed order
+     */
     @NonNull
     public ConsList<E> reverse() {
         ConsList<E> result = nil();
@@ -152,10 +169,15 @@ public final class ConsList<E> extends AbstractCollection<E> {
     }
 
     @Override
+    public boolean isEmpty() {
+        return tail == null;
+    }
+
+    @Override
     public int size() {
-        int size = 0;
+        int size = nilSize();
         ConsList<E> cons = this;
-        while (cons.tail != null) {
+        while (cons.tail != null && size != Integer.MAX_VALUE) {
             size++;
             cons = cons.tail;
         }
@@ -170,27 +192,39 @@ public final class ConsList<E> extends AbstractCollection<E> {
 
     @NonNull
     @Override
-    public Stream<E> stream() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-            iterator(), Spliterator.IMMUTABLE), false);
+    public Spliterator<E> spliterator() {
+        return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.IMMUTABLE);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
         if (!(o instanceof ConsList)) {
             return false;
         }
-        ConsList<?> consList = (ConsList<?>) o;
-        return Objects.equals(head, consList.head) &&
-            Objects.equals(tail, consList.tail);
+        ConsList<?> cons = this;
+        ConsList<?> otherCons = (ConsList<?>) o;
+        while (cons.tail != null && otherCons.tail != null) {
+            if (!Objects.equals(cons.head, otherCons.head)) {
+                return false;
+            }
+            cons = cons.tail;
+            otherCons = otherCons.tail;
+        }
+        return cons.tail == null && otherCons.tail == null;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(head, tail);
+    public final int hashCode() {
+        int result = 1;
+        ConsList<E> cons = this;
+        while (cons.tail != null) {
+            result = 31 * result + (cons.head == null ? 0 : cons.head.hashCode());
+            cons = cons.tail;
+        }
+        return result;
     }
 
     private static final class ConsIterator<E> implements Iterator<E> {
@@ -214,5 +248,10 @@ public final class ConsList<E> extends AbstractCollection<E> {
             cons = cons.tail;
             return next;
         }
+    }
+
+    // Method for tests.
+    int nilSize() {
+        return 0;
     }
 }
