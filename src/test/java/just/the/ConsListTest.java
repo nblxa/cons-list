@@ -1,12 +1,9 @@
 package just.the;
 
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static just.the.ConsList.*;
@@ -137,5 +134,11 @@ public class ConsListTest {
         assertThat(spyCons)
             .isNotEmpty()
             .hasSize(Integer.MAX_VALUE);
+    }
+
+    @Test
+    public void hashCode_value() {
+        ConsList<Integer> fortyTwo = cons(11, cons(11, nil()));
+        assertThat(fortyTwo.hashCode()).isEqualTo(1313);
     }
 }
