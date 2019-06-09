@@ -4,6 +4,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -22,7 +23,8 @@ import java.util.*;
  */
 @Immutable
 @ThreadSafe
-public class ConsList<E> extends AbstractCollection<E> {
+public class ConsList<E> extends AbstractCollection<E> implements Serializable {
+    private static final long serialVersionUID = -2746754218342304128L;
     private static final ConsList NIL = new ConsList<Void>(null, null);
 
     /**
