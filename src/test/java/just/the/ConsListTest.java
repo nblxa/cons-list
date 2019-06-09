@@ -141,4 +141,102 @@ public class ConsListTest {
         ConsList<Integer> fortyTwo = cons(11, cons(11, nil()));
         assertThat(fortyTwo.hashCode()).isEqualTo(1313);
     }
+
+    @Test
+    public void consList_fromNull_throwsNpe() {
+        Throwable t = catchThrowable(() -> consList(null));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasNoCause()
+            .hasMessage("iterable is null");
+    }
+
+    @Test
+    public void consList_fromCons_returnsSelf() {
+        Iterable<Integer> input = list(100500, 42);
+        ConsList<Integer> fromCons = consList(input);
+
+        assertThat(fromCons == input).isTrue();
+    }
+
+    @Test
+    public void consList_fromArraysArrayList_yieldsSameOrderAsList() {
+        Iterable<Integer> input = Arrays.asList(100500, 42);
+        ConsList<Integer> fromCons = consList(input);
+
+        assertThat(fromCons)
+            .hasSize(2)
+            .isNotEmpty()
+            .containsExactly(100500, 42);
+    }
+
+    @Test
+    public void consList_fromArraysArrayListReversed_yieldsSameOrderAsList() {
+        Iterable<Integer> input = Arrays.asList(42, 100500);
+        ConsList<Integer> fromCons = consList(input);
+
+        assertThat(fromCons)
+            .hasSize(2)
+            .isNotEmpty()
+            .containsExactly(42, 100500);
+    }
+
+    @Test
+    public void consList_fromSet_returnsSameElements() {
+        Set<Integer> input = new HashSet<>(Arrays.asList(100500, 42));
+        ConsList<Integer> fromCons = consList(input);
+
+        assertThat(fromCons)
+            .hasSize(2)
+            .isNotEmpty()
+            .containsExactlyInAnyOrder(100500, 42);
+    }
+
+    @Test
+    public void concat_none_yieldsNil() {
+        assertThat(concat())
+            .isEqualTo(nil())
+            .hasSize(0)
+            .isEmpty();
+    }
+
+    @Test
+    public void concat_one_yieldsSelf() {
+        ConsList<String> input = concat(list("There", "must", "be", "only", "one!"));
+        assertThat(concat(input) == input).isTrue();
+    }
+
+    @Test
+    public void concat_many_yieldsSameOrder() {
+        ConsList<Integer> binomial = concat(list(1), list(1, 1), list(1, 2, 1), list(1, 3, 3, 1));
+        assertThat(binomial)
+            .containsExactly(1, 1, 1, 1, 2, 1, 1, 3, 3, 1);
+    }
+
+    @Test
+    public void concat_oneNullVararg_throwsException() {
+        Throwable t = catchThrowable(() -> concat(null));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasNoCause()
+            .hasMessage("Argument array lists is null");
+    }
+
+    @Test
+    public void concat_lastNullListArg_throwsException() {
+        Throwable t = catchThrowable(() -> concat(list(1, 2), null));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasNoCause()
+            .hasMessage("Null argument at position 1");
+    }
+
+    @Test
+    public void concat_firstNullListArg_throwsException() {
+        Throwable t = catchThrowable(() -> concat(null, list(1, 2)));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasNoCause()
+            .hasMessage("Null argument at position 0");
+    }
 }

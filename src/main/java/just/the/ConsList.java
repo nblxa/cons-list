@@ -1,15 +1,18 @@
 package just.the;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.util.*;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * The ultimate immutable and thread-safe Cons List that implements {@link java.util.Collection}
- * and does not consume the stack.
+ * and avoids recursive calls.
  *
  * <p>Usage:
  *
@@ -54,8 +57,8 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * @return      a cons list with the given head and tail elements
      */
     @NonNull
-    public static <V> ConsList<V> cons(V head, @NonNull ConsList<V> tail) {
-        return new ConsList<>(head, Objects.requireNonNull(tail, "tail is null"));
+    public static <V> ConsList<V> cons(@Nullable V head, @NonNull ConsList<V> tail) {
+        return new ConsList<>(head, requireNonNull(tail, "tail is null"));
     }
 
     /**
@@ -65,7 +68,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * <p>The head, the tail elements and the resulting list have the same compile-time type
      * defined by the parameter <tt>klass</tt>. This type must be the common supertype
      * of both the new head element and the elements of the tail. The parameter is required
-     * to overcome the deficiencies of the Java generics and type inference.
+     * to overcome the deficiencies of the Java generics and type inference in JDK 8.
      *
      * <p>This works without the explicit type parameter:
      * <pre>ConsList&apos;Number&apos; l = cons(3.14d, cons(10, nil()));</pre>
@@ -87,10 +90,10 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      */
     @NonNull
     @SuppressWarnings({"unchecked", "unused"})
-    public static <V, U extends V> ConsList<V> cons(U head, @NonNull ConsList<? extends V> tail,
+    public static <V, U extends V> ConsList<V> cons(@Nullable U head,
+                                                    @NonNull ConsList<? extends V> tail,
                                                     @NonNull Class<V> klass) {
-        return (ConsList<V>) new ConsList(head,
-            Objects.requireNonNull(tail, "tail is null"));
+        return (ConsList<V>) new ConsList(head, requireNonNull(tail, "tail is null"));
     }
 
     /**
@@ -104,16 +107,80 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      *
      * @param elements  any number of elements of the list to be constructed
      * @param <V>       element type
-     * @return          the cons list with
+     * @return          the cons list with the elements consList the argument array in the same order
      */
     @NonNull
     @SafeVarargs
-    public static <V> ConsList<V> list(V... elements) {
+    public static <V> ConsList<V> list(@NonNull V... elements) {
         ConsList<V> cons = nil();
         for (int i = elements.length - 1; i >= 0; i--) {
             cons = cons(elements[i], cons);
         }
         return cons;
+    }
+
+    /**
+     * Constructs a new cons list consList the given {@link Iterable}.
+     *
+     * <p>If the {@link Iterable} is itself a ConsList, returns the typecast iterable.
+     *
+     * <p>For instances of {@link List}, only one iteration backwards through the list&apos;s
+     * {@link ListIterator} will be done.
+     *
+     * <p>For all other {@link Iterable} types, this traverses both the Iterable
+     * and the intermediate ConsList once.
+     *
+     * @param iterable  input iterable
+     * @param <V>       element type
+     * @return          the cons list with the elements consList the Iterable in the same order
+     */
+    @NonNull
+    public static <V> ConsList<V> consList(@NonNull Iterable<V> iterable) {
+        Objects.requireNonNull(iterable, "iterable is null");
+        if (iterable instanceof ConsList) {
+            return (ConsList<V>) iterable;
+        }
+        ConsList<V> cons = nil();
+        if (iterable instanceof List) {
+            List<V> list = (List<V>) iterable;
+            ListIterator<V> iter = list.listIterator(list.size());
+            while (iter.hasPrevious()) {
+                cons = cons(iter.previous(), cons);
+            }
+            return cons;
+        } else {
+            for (V v : iterable) {
+                cons = cons(v, cons);
+            }
+            return cons.reverse();
+        }
+    }
+
+    /**
+     * Returns a cons list that contains the concatenation of elements of all argument cons lists.
+     *
+     * @param lists argument cons lists, each of them not nullable
+     * @param <V>   element type of all argument lists and the resulting list
+     * @return      the concatentation of all argument lists
+     */
+    @NonNull
+    @SafeVarargs
+    public static <V> ConsList<V> concat(@NonNull ConsList<V>... lists) {
+        Objects.requireNonNull(lists, "Argument array lists is null");
+        if (lists.length == 0) {
+            return nil();
+        }
+        ConsList<V> result = requireNonNull(lists[lists.length - 1],
+            "Null argument at position " + (lists.length - 1));
+        for (int i = lists.length - 2; i >= 0; i--) {
+            ConsList<V> cons = requireNonNull(lists[i], "Null argument at position " + i)
+                .reverse();
+            while (cons.tail != null) {
+                result = cons(cons.head, result);
+                cons = cons.tail;
+            }
+        }
+        return result;
     }
 
     private final E head;
