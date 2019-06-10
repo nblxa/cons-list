@@ -60,6 +60,21 @@ public class ConsListTest {
     }
 
     @Test
+    public void spliterator_hasCharacteristics() {
+        ConsList<String> strings = list("Hello", "functional", "programming", "!");
+        Spliterator<String> spliter = strings.spliterator();
+
+        assertThat(spliter.hasCharacteristics(Spliterator.DISTINCT)).isFalse();
+        assertThat(spliter.hasCharacteristics(Spliterator.SORTED)).isFalse();
+        assertThat(spliter.hasCharacteristics(Spliterator.ORDERED)).isTrue();
+        assertThat(spliter.hasCharacteristics(Spliterator.SIZED)).isFalse();
+        assertThat(spliter.hasCharacteristics(Spliterator.NONNULL)).isFalse();
+        assertThat(spliter.hasCharacteristics(Spliterator.IMMUTABLE)).isTrue();
+        assertThat(spliter.hasCharacteristics(Spliterator.CONCURRENT)).isFalse();
+        assertThat(spliter.hasCharacteristics(Spliterator.SUBSIZED)).isFalse();
+    }
+
+    @Test
     public void cons_withTypeInference() {
         ConsList<Number> n = cons(3.14d, cons(10, nil()));
         assertThat(n)

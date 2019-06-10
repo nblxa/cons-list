@@ -20,8 +20,8 @@ Collection methods are implemented:
 * `size()` iterates through the list and correctly handles lists with
   more than `Integer.MAX_VALUE` elements.
 * `isEmpty()` does not try to calculate the size to see if it is 0.
-* `spliterator()` correctly assumes no information about the size and
-  knows the collection is immutable.
+* `spliterator()` has the right characteristics for the cons list:
+  `ORDERED` and `IMMUTABLE`.
 
 Methods `equals(Object o)` and `hashCode()` are also implemented
 without recursion.

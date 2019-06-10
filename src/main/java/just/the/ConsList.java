@@ -262,7 +262,8 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
     @NonNull
     @Override
     public Spliterator<E> spliterator() {
-        return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.IMMUTABLE);
+        return Spliterators.spliteratorUnknownSize(iterator(),
+            Spliterator.ORDERED | Spliterator.IMMUTABLE);
     }
 
     @Override
