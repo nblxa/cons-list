@@ -254,4 +254,26 @@ public class ConsListTest {
             .hasNoCause()
             .hasMessage("Null argument at position 0");
     }
+
+    @Test
+    public void collector_emptyStream_yieldsNil() {
+        ConsList<String> empty = Arrays.stream(new String[0])
+            .collect(toConsCollector());
+
+        assertThat(empty)
+            .isEqualTo(nil())
+            .hasSize(0)
+            .isEmpty();
+    }
+
+    @Test
+    public void collector_nonEmptyStream_yieldsCons() {
+        ConsList<String> empty = Arrays.stream(new String[] {"Apples", "Pears", "Oranges"})
+            .collect(toConsCollector());
+
+        assertThat(empty)
+            .hasSize(3)
+            .isNotEmpty()
+            .containsExactly("Apples", "Pears", "Oranges");
+    }
 }

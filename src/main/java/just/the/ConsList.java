@@ -7,6 +7,8 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -181,6 +183,14 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns a {@link Collector} collecting a Stream into a cons list.
+     */
+    @NonNull
+    public static <T> Collector<T, ?, ConsList<T>> toConsCollector() {
+        return Collectors.collectingAndThen(Collectors.toList(), ConsList::consList);
     }
 
     private final E head;

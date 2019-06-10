@@ -20,11 +20,16 @@ Collection methods are implemented:
 * `size()` iterates through the list and correctly handles lists with
   more than `Integer.MAX_VALUE` elements.
 * `isEmpty()` does not try to calculate the size to see if it is 0.
+
+Java 8 Streams support:
 * `spliterator()` has the right characteristics for the cons list:
   `ORDERED` and `IMMUTABLE`.
+* a custom Collector `toConsCollector` is provided.
 
 Methods `equals(Object o)` and `hashCode()` are also implemented
 without recursion.
+
+Finally, the class is `Serializable`.
 
 Cons List, due to its simplicity and immutability, is an ideal data
 structure for multi-threaded processing of ordered collections of data.
@@ -52,4 +57,11 @@ Create a list of an arbitrary length:
 
 ```java
 Collection<String> strings = list("Hello", "functional", "programming", "!");
+```
+Create a list from a Stream:
+
+```java
+ConsList<String> fruit = Arrays.stream(new String[] {"Apples", "Bananas", "Oranges"})
+    .filter(f -> !f.startsWith("O"))
+    .collect(toConsCollector());
 ```
