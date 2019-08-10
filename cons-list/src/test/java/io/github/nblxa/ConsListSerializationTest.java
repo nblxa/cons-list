@@ -1,4 +1,4 @@
-package just.the;
+package io.github.nblxa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.io.*;
 import java.util.List;
 
-import static just.the.ConsList.*;
+import static io.github.nblxa.ConsList.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsListSerializationTest {

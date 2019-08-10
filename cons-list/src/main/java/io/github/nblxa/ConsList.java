@@ -1,4 +1,4 @@
-package just.the;
+package io.github.nblxa;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;

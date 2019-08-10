@@ -1,10 +1,10 @@
-package just.the;
+package io.github.nblxa;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
-import static just.the.ConsList.*;
+import static io.github.nblxa.ConsList.*;
 
 public class ConsListEqualsTest {
 
