@@ -37,8 +37,9 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static io.github.nblxa.ConsList.*;
@@ -50,27 +51,30 @@ public class ConsListBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
             .include(ConsListBenchmark.class.getSimpleName())
+            .addProfiler("hs_gc")
+            .warmupIterations(5)
+            .forks(3)
             .build();
         new Runner(opt).run();
     }
 
-    private ConsList<String> consList;
-    private CopyOnWriteArrayList<String> cowaList;
+    private ConsList<String> consList = nil();
+    private ArrayList<String> arrayList = new ArrayList<>();
 
     @Setup
     public void setup() {
         consList = list("Io", "Europa", "Ganymede", "Callisto", "Io");
-        cowaList = new CopyOnWriteArrayList<>(consList);
+        arrayList = new ArrayList<>(consList);
     }
 
     @Benchmark
     public void findAllPermutations_ConsList() {
-        ConsList<ConsList<String>> permutations = permutations(consList);
+        permutations(consList);
     }
 
     @Benchmark
-    public void findAllPermutations_COWAList() {
-        List<List<String>> permutations = permutations(cowaList);
+    public void findAllPermutations_ArrayList() {
+        permutations(arrayList);
     }
 
     static <T> ConsList<ConsList<T>> permutations(ConsList<T> list) {
@@ -95,22 +99,21 @@ public class ConsListBenchmark {
         }
     }
 
-    @SuppressWarnings("unchecked")
     static <T> List<List<T>> permutations(List<T> list) {
         if (list.isEmpty()) {
-            return new CopyOnWriteArrayList(new List[]{list});
+            return Collections.singletonList(list);
         } else {
-            List<List<T>> permutations = new CopyOnWriteArrayList<>();
-            List<T> priorElements = new CopyOnWriteArrayList<>();
+            List<List<T>> permutations = new ArrayList<>();
+            List<T> priorElements = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
                 T currentElement = list.get(i);
                 if (!priorElements.contains(currentElement)) {
-                    List<T> listWithoutCurrentElement = new CopyOnWriteArrayList<>(priorElements);
-                    listWithoutCurrentElement.addAll(list.subList(i + 1, list.size()));
+                    List<T> listWithoutCurrentElement = new ArrayList<>(list);
+                    listWithoutCurrentElement.remove(i);
                     for (List<T> perm : permutations(listWithoutCurrentElement)) {
-                        List<T> permutation = new CopyOnWriteArrayList<>(perm);
+                        List<T> permutation = new ArrayList<>(perm);
                         permutation.add(currentElement);
-                        permutations = new CopyOnWriteArrayList<>(permutations);
+                        permutations = new ArrayList<>(permutations);
                         permutations.add(permutation);
                     }
                 }

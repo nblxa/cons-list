@@ -2,15 +2,16 @@ package io.github.nblxa;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static io.github.nblxa.ConsList.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsListBenchmarkTest {
     @Test
-    public void testConsList() {
+    public void test_consList() {
         ConsList<ConsList<Integer>> perms = ConsListBenchmark.permutations(list(1, 2, 2, 3));
         assertThat(perms)
             .isNotEmpty()
@@ -24,21 +25,20 @@ public class ConsListBenchmarkTest {
     }
 
     @Test
-    public void testCopyOnWriteArrayList() {
-        List<List<Integer>> perms = ConsListBenchmark.permutations(cowal(1, 2, 2, 3));
+    public void test_arrayList() {
+        List<List<Integer>> perms = ConsListBenchmark.permutations(arrList(1, 2, 2, 3));
         assertThat(perms)
             .isNotEmpty()
             .hasSize(12)
             .containsExactlyInAnyOrder(
-                cowal(1, 2, 2, 3), cowal(2, 1, 2, 3), cowal(2, 2, 1, 3),
-                cowal(1, 2, 3, 2), cowal(2, 1, 3, 2), cowal(2, 2, 3, 1),
-                cowal(1, 3, 2, 2), cowal(2, 3, 1, 2), cowal(2, 3, 2, 1),
-                cowal(3, 1, 2, 2), cowal(3, 2, 1, 2), cowal(3, 2, 2, 1)
+                arrList(1, 2, 2, 3), arrList(2, 1, 2, 3), arrList(2, 2, 1, 3),
+                arrList(1, 2, 3, 2), arrList(2, 1, 3, 2), arrList(2, 2, 3, 1),
+                arrList(1, 3, 2, 2), arrList(2, 3, 1, 2), arrList(2, 3, 2, 1),
+                arrList(3, 1, 2, 2), arrList(3, 2, 1, 2), arrList(3, 2, 2, 1)
             );
     }
 
-    private static CopyOnWriteArrayList<Integer> cowal(Integer... ints) {
-        return new CopyOnWriteArrayList<>(ints);
+    private static List<Integer> arrList(Integer... ints) {
+        return new ArrayList<>(Arrays.asList(ints));
     }
 }
-
