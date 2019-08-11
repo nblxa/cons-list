@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import static io.github.nblxa.ConsList.*;
@@ -26,7 +27,7 @@ public class ConsListBenchmarkTest {
 
     @Test
     public void test_arrayList() {
-        List<List<Integer>> perms = ConsListBenchmark.permutations(arrList(1, 2, 2, 3));
+        List<ArrayList<Integer>> perms = ConsListBenchmark.permutations(arrList(1, 2, 2, 3));
         assertThat(perms)
             .isNotEmpty()
             .hasSize(12)
@@ -38,7 +39,25 @@ public class ConsListBenchmarkTest {
             );
     }
 
-    private static List<Integer> arrList(Integer... ints) {
+    @Test
+    public void test_linkedList() {
+        List<LinkedList<Integer>> perms = ConsListBenchmark.permutations(lnkList(1, 2, 2, 3));
+        assertThat(perms)
+            .isNotEmpty()
+            .hasSize(12)
+            .containsExactlyInAnyOrder(
+                lnkList(1, 2, 2, 3), lnkList(2, 1, 2, 3), lnkList(2, 2, 1, 3),
+                lnkList(1, 2, 3, 2), lnkList(2, 1, 3, 2), lnkList(2, 2, 3, 1),
+                lnkList(1, 3, 2, 2), lnkList(2, 3, 1, 2), lnkList(2, 3, 2, 1),
+                lnkList(3, 1, 2, 2), lnkList(3, 2, 1, 2), lnkList(3, 2, 2, 1)
+            );
+    }
+
+    private static ArrayList<Integer> arrList(Integer... ints) {
         return new ArrayList<>(Arrays.asList(ints));
+    }
+
+    private static LinkedList<Integer> lnkList(Integer... ints) {
+        return new LinkedList<>(Arrays.asList(ints));
     }
 }

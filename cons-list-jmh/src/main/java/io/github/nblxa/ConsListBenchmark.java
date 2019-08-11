@@ -39,6 +39,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -48,10 +49,18 @@ import static io.github.nblxa.ConsList.*;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 public class ConsListBenchmark {
+    private static int MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 5;
+    private static final int[] FACT = new int[] {
+    //  0, 1, 2, 3,  4,   5,   6,     7,      8,       9,        10,         11,          12
+        1, 1, 2, 6, 24, 120, 720, 5_040, 40_320, 362_880, 3_628_800, 39_916_800, 479_001_600,
+        MAX_ARRAY_LENGTH
+    };
+
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
             .include(ConsListBenchmark.class.getSimpleName())
-            .addProfiler("hs_gc")
+            .addProfiler("gc")
+            .addProfiler(SizeOfProfiler.class)
             .warmupIterations(5)
             .forks(3)
             .build();
@@ -60,21 +69,31 @@ public class ConsListBenchmark {
 
     private ConsList<String> consList = nil();
     private ArrayList<String> arrayList = new ArrayList<>();
+    private LinkedList<String> linkedList = new LinkedList<>();
 
     @Setup
     public void setup() {
-        consList = list("Io", "Europa", "Ganymede", "Callisto", "Io");
+        consList = list("Io", "Europa", "Ganymede", "Callisto", "Io", "Thebe", "Amalthea");
         arrayList = new ArrayList<>(consList);
+        linkedList = new LinkedList<>(consList);
     }
 
     @Benchmark
     public void findAllPermutations_ConsList() {
-        permutations(consList);
+        ConsList<ConsList<String>> perms = permutations(consList);
+        SizeOfProfiler.setRootObject(perms);
     }
 
     @Benchmark
     public void findAllPermutations_ArrayList() {
-        permutations(arrayList);
+        List<ArrayList<String>> perms = permutations(arrayList);
+        SizeOfProfiler.setRootObject(perms);
+    }
+
+    @Benchmark
+    public void findAllPermutations_LinkedList() {
+        List<LinkedList<String>> perms = permutations(linkedList);
+        SizeOfProfiler.setRootObject(perms);
     }
 
     static <T> ConsList<ConsList<T>> permutations(ConsList<T> list) {
@@ -99,25 +118,50 @@ public class ConsListBenchmark {
         }
     }
 
-    static <T> List<List<T>> permutations(List<T> list) {
+    static <T> List<ArrayList<T>> permutations(ArrayList<T> list) {
         if (list.isEmpty()) {
             return Collections.singletonList(list);
         } else {
-            List<List<T>> permutations = new ArrayList<>();
-            List<T> priorElements = new ArrayList<>();
+            List<ArrayList<T>> permutations = new ArrayList<>(FACT[list.size()]);
+            List<T> priorElements = new ArrayList<>(list.size());
             for (int i = 0; i < list.size(); i++) {
                 T currentElement = list.get(i);
                 if (!priorElements.contains(currentElement)) {
-                    List<T> listWithoutCurrentElement = new ArrayList<>(list);
+                    ArrayList<T> listWithoutCurrentElement = new ArrayList<>(list);
                     listWithoutCurrentElement.remove(i);
                     for (List<T> perm : permutations(listWithoutCurrentElement)) {
-                        List<T> permutation = new ArrayList<>(perm);
+                        ArrayList<T> permutation = new ArrayList<>(perm);
                         permutation.add(currentElement);
                         permutations = new ArrayList<>(permutations);
                         permutations.add(permutation);
                     }
                 }
                 priorElements.add(currentElement);
+            }
+            return permutations;
+        }
+    }
+
+    static <T> List<LinkedList<T>> permutations(LinkedList<T> list) {
+        if (list.isEmpty()) {
+            return Collections.singletonList(list);
+        } else {
+            List<LinkedList<T>> permutations = new LinkedList<>();
+            List<T> priorElements = new LinkedList<>();
+            int i = 0;
+            for (T currentElement: list) {
+                if (!priorElements.contains(currentElement)) {
+                    LinkedList<T> listWithoutCurrentElement = new LinkedList<>(list);
+                    listWithoutCurrentElement.remove(i);
+                    for (List<T> perm : permutations(listWithoutCurrentElement)) {
+                        LinkedList<T> permutation = new LinkedList<>(perm);
+                        permutation.add(currentElement);
+                        permutations = new LinkedList<>(permutations);
+                        permutations.add(permutation);
+                    }
+                }
+                priorElements.add(currentElement);
+                i++;
             }
             return permutations;
         }
