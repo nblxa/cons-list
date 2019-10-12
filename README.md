@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/nblxa/just-the-cons-list.svg?branch=master)](https://travis-ci.com/nblxa/just-the-cons-list)
-[![Coverage Status](https://coveralls.io/repos/github/com.github.nblxa/just-the-cons-list/badge.svg?branch=master)](https://coveralls.io/github/com.github.nblxa/just-the-cons-list?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/nblxa/just-the-cons-list/badge.svg?branch=master)](https://coveralls.io/github/nblxa/just-the-cons-list?branch=master)
 
 # Just the Cons List and nothing else
 
