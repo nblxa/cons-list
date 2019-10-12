@@ -21,7 +21,7 @@
         <assertj.version>3.12.2</assertj.version>
         <equalsverifier.version>3.1.9</equalsverifier.version>
         <mockito.version>2.28.2</mockito.version>
-        <jackson.version>2.9.9.2</jackson.version>
+        <jackson.version>2.10.0</jackson.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <javac.target>1.8</javac.target>
         <jacoco.maven.plugin.version>0.8.4</jacoco.maven.plugin.version>
