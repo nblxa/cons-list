@@ -22,7 +22,7 @@ import static java.util.Objects.requireNonNull;
  * import static just.the.ConsList.*;
  * ...
  * ConsList&lt;String&gt; list = list(&quot;Apples&quot;, &quot;Oranges&quot;, &quot;Bananas&quot;);
- * list.forEach(fruit -> System.out.println(&quot;I like &quot; + fruit);</pre>
+ * list.forEach(fruit -&gt; System.out.println(&quot;I like &quot; + fruit);</pre>
  *
  * @param <E> element type
  */
@@ -73,11 +73,11 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * to overcome the deficiencies of the Java generics and type inference in JDK 8.
      *
      * <p>This works without the explicit type parameter:
-     * <pre>ConsList&apos;Number&apos; l = cons(3.14d, cons(10, nil()));</pre>
+     * <pre>ConsList&lt;Number&gt; l = cons(3.14d, cons(10, nil()));</pre>
      *
      * <p>But this requires it:
-     * <pre>ConsList&apos;Integer&apos; l = cons(10, nil());
-     *     ConsList&apos;Number&apos; l = cons(3.14d, i, Number.class);</pre>
+     * <pre>ConsList&lt;Integer&gt; l = cons(10, nil());
+     *     ConsList&lt;Number&gt; l = cons(3.14d, i, Number.class);</pre>
      *
      * <p>The original list is not modified.
      *
@@ -87,7 +87,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      *              to provide static type binding at compile-time
      * @param <V>   element type of the resulting list: base class of both <tt>head</tt>
      *              and elements of <tt>tail</tt>
-     * @param <U>   element type of the new list&apos;s head
+     * @param <U>   element type of the new list's head
      * @return      a cons list with the given head and tail elements and of given element type
      */
     @NonNull
@@ -126,7 +126,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      *
      * <p>If the {@link Iterable} is itself a ConsList, returns the typecast iterable.
      *
-     * <p>For instances of {@link List}, only one iteration backwards through the list&apos;s
+     * <p>For instances of {@link List}, only one iteration backwards through the list's
      * {@link ListIterator} will be done.
      *
      * <p>For all other {@link Iterable} types, this traverses both the Iterable
@@ -187,6 +187,8 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
 
     /**
      * Returns a {@link Collector} collecting a Stream into a cons list.
+     * @param <T>   element type
+     * @return      a collector collecting into a cons list
      */
     @NonNull
     public static <T> Collector<T, ?, ConsList<T>> toConsCollector() {
@@ -217,7 +219,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
     }
 
     /**
-     * Returns another cons list containing the current list&apos;s elements after the first one.
+     * Returns another cons list containing the current list's elements after the first one.
      *
      * <p>Throws {@link NoSuchElementException} if the list is empty.
      *
