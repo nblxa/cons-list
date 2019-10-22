@@ -1,12 +1,12 @@
 language: java
 jdk:
-  - openjdk8
+- openjdk8
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=nblxa_just-the-cons-list
+- "./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=nblxa_just-the-cons-list"
 after_success:
-  - ./mvnw jacoco:report coveralls:report -e
+- "./mvnw jacoco:report coveralls:report -e"
 addons:
   sonarcloud:
-    organization: "nblxa"
+    organization: nblxa
     token:
-      secure: "iRPElHjBpc7OhFNfyM0uRpk4jBEEdBQVOR+CN0joTmLNkI3Pn91ZtPtv5XDGWidM+4aci4vSEe+VDcY8Zve88XeuyaNNH7oYT4zglNkMIIUd4ToOPIqNWQLcg5AeLHAKFafhCPPg9AWTPIwYZwSApkUJwTr6X769UjLc3IWPyOSm2BJv8X71QVJqHqbcf7pIeJp89UkdSCWJ1bZha6wL0WdCigCfbntO9GITUVbVklTJd+kBVN3HVQiGvb2RWpp5AZLJ055icdjQk/6xl23qsrTrwDn8IvKrGdYqy/eT91Zp4GshD5QjepQOcq7EqDuCRKApBGQGnmHeyaZs5BwbYkqZkqKdF4e7SD/eVlp7G5zz90d2dIY2kcYXnnsBlZocBJsWQfGr0dxkvg2kUVOnWjGGD34yjZSvAFOxr4mTYWkCDp6mr2PFjkgCQUCvSXjO5ODqJ0hn2gmrz0PyXAvZ70PGHzMcAYKHHkx/1tDHLlHk41SDMwcY9/9e8LTMkfL4WrBg90fYkRAKNHh9FsuLfgv1GGB7eGeq3PCHcujM8Cvs/Dpl06w5z2rCdusdA9Rs6H15FPTMI66h+GNQZawhfsvQSx/mHAm4RFcfPlyXkzR9j9uyeu/Wqupbs2xEp9gqXcpcUnD19vyS7zE17LTL10dd25Wpm0WtebyS7tluDwA="
+      secure: "YpdMQ9XyBsMdn2f9h1USwAgI5VUIa/kyWn60OP8BlElesp0LEN9jTQxdv4TV3qkm6rlu6p3Vc7Q+T2XuKhKsyx6vjuA3bCJrW9byAqbzo0NE8lHLGZqWfaeOsFR5sZ7YVIjso8lqxa+5ieJJcg/S05xVIsRCECG1GzZlYj5ycfiqqDlQVZiBe2k/p68WygoTXiU6MU2d2jhsmNLwmgnPDWbK/cGPgI/2jhXPFrhCbAVpLXHS9qzgOtB9yI3slgrYvtZEOzNH+pjX8wAKzf02VQ+DK9PTO4CHOK3505axSaEoPVcougSeoS2NOqFlgmruOEfYYYZo+M8R5lxQPY5G7Mw4WifkGg85TsiLXvwXSwW/R350qAvVmy54ied+8biOKdjH8HciWGIo1peAGhElZ6IJdwoof5F/B+pS5nHMfdzCzed3sn8SeBGzvqKLuOyYyptM00BsWhK7R3Wsw5DLzy4DEQTveJz9ycsdMtMMXAmG/5D587Wga4mhIE7EbbZ+NfQP8MFDHoD86exY31yQTTSzgSZUsUyI3yeH1OrSvzhe5wN1g2Bq7PKi0BWLgJEFWOwLwkp4heg6wDnU0ednA6fYW8EEgcmkX4BgELYaaXhooAodX4rPZxf4OstOr1ke/UoZDxn39ae3qVVj+j0mbbK+6hhVU9sQJhVwL4TVkCc="
