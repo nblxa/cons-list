@@ -31,139 +31,86 @@
 
 package io.github.nblxa;
 
+import io.github.nblxa.benchmark.ArrayListLineage;
+import io.github.nblxa.benchmark.ConsListLineage;
+import io.github.nblxa.benchmark.LinkedListLineage;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static io.github.nblxa.ConsList.*;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 public class ConsListBenchmark {
-    private static int MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 5;
-    private static final int[] FACT = new int[] {
-    //  0, 1, 2, 3,  4,   5,   6,     7,      8,       9,        10,         11,          12
-        1, 1, 2, 6, 24, 120, 720, 5_040, 40_320, 362_880, 3_628_800, 39_916_800, 479_001_600,
-        MAX_ARRAY_LENGTH
-    };
-
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
             .include(ConsListBenchmark.class.getSimpleName())
             .addProfiler("gc")
-            .addProfiler(SizeOfProfiler.class)
-            .warmupIterations(5)
-            .forks(3)
+            .warmupIterations(3)
+            .forks(2)
             .build();
         new Runner(opt).run();
     }
 
-    private ConsList<String> consList = nil();
-    private ArrayList<String> arrayList = new ArrayList<>();
-    private LinkedList<String> linkedList = new LinkedList<>();
+    private List<Klass> klasses;
+    private ConsListLineage consListLineage;
+    private ArrayListLineage arrayListLineage;
+    private LinkedListLineage linkedListLineage;
 
     @Setup
     public void setup() {
-        consList = list("Io", "Europa", "Ganymede", "Callisto", "Io", "Thebe", "Amalthea");
-        arrayList = new ArrayList<>(consList);
-        linkedList = new LinkedList<>(consList);
+        Klass object = new Klass("object");
+        Klass string = new Klass("string", object);
+        Klass abstractCollection = new Klass("abstractCollection", object);
+        Klass abstractList = new Klass("abstractList", abstractCollection);
+        Klass arrayList = new Klass("arrayList", abstractList);
+        Klass abstractSequentialList = new Klass("abstractSequentialList", abstractList);
+        Klass linkedList = new Klass("linkedList", abstractSequentialList);
+        Klass keepAliveStreamCleaner = new Klass("keepAliveStreamCleaner", linkedList);
+        Klass identityLinkedList = new Klass("identityLinkedList", abstractSequentialList);
+        Klass abstractSet = new Klass("abstractSet", abstractCollection);
+        Klass hashSet = new Klass("hashSet", abstractSet);
+        Klass treeSet = new Klass("treeSet", abstractSet);
+        Klass consList = new Klass("consList", abstractCollection);
+        klasses = new ArrayList<>(Arrays.asList(object, string, abstractCollection, abstractList,
+            arrayList, abstractSequentialList, linkedList, keepAliveStreamCleaner,
+            identityLinkedList, abstractSet, hashSet, treeSet, consList));
+
+        for (int i = 0; i < 100_000; i++) {
+            Random rand = new Random(42L);
+            Klass randKlass = klasses.get(rand.nextInt(klasses.size()));
+            Klass newKlass = new Klass(randKlass.name() + ".r", randKlass);
+            klasses.add(newKlass);
+        }
+
+        consListLineage = new ConsListLineage();
+        arrayListLineage = new ArrayListLineage();
+        linkedListLineage = new LinkedListLineage();
     }
 
     @Benchmark
-    public void findAllPermutations_ConsList() {
-        ConsList<ConsList<String>> perms = permutations(consList);
-        SizeOfProfiler.setRootObject(perms);
-    }
-
-    @Benchmark
-    public void findAllPermutations_ArrayList() {
-        List<ArrayList<String>> perms = permutations(arrayList);
-        SizeOfProfiler.setRootObject(perms);
-    }
-
-    @Benchmark
-    public void findAllPermutations_LinkedList() {
-        List<LinkedList<String>> perms = permutations(linkedList);
-        SizeOfProfiler.setRootObject(perms);
-    }
-
-    static <T> ConsList<ConsList<T>> permutations(ConsList<T> list) {
-        if (list.isEmpty()) {
-            return cons(list, nil());
-        } else {
-            ConsList<ConsList<T>> permutations = nil();
-            ConsList<T> priorElements = nil();
-            while (!list.isEmpty()) {
-                T currentElement = list.head();
-                if (!priorElements.contains(currentElement)) {
-                    ConsList<T> listWithoutCurrentElement = concat(priorElements, list.tail());
-                    for (ConsList<T> perm : permutations(listWithoutCurrentElement)) {
-                        ConsList<T> permutation = cons(currentElement, perm);
-                        permutations = cons(permutation, permutations);
-                    }
-                }
-                priorElements = cons(currentElement, priorElements);
-                list = list.tail();
-            }
-            return permutations;
+    public void flattenHierarchy_ConsList() {
+        for (Klass klass : klasses) {
+            consListLineage.lineage(klass);
         }
     }
 
-    static <T> List<ArrayList<T>> permutations(ArrayList<T> list) {
-        if (list.isEmpty()) {
-            return Collections.singletonList(list);
-        } else {
-            List<ArrayList<T>> permutations = new ArrayList<>(FACT[list.size()]);
-            List<T> priorElements = new ArrayList<>(list.size());
-            for (int i = 0; i < list.size(); i++) {
-                T currentElement = list.get(i);
-                if (!priorElements.contains(currentElement)) {
-                    ArrayList<T> listWithoutCurrentElement = new ArrayList<>(list);
-                    listWithoutCurrentElement.remove(i);
-                    for (List<T> perm : permutations(listWithoutCurrentElement)) {
-                        ArrayList<T> permutation = new ArrayList<>(perm);
-                        permutation.add(currentElement);
-                        permutations = new ArrayList<>(permutations);
-                        permutations.add(permutation);
-                    }
-                }
-                priorElements.add(currentElement);
-            }
-            return permutations;
+    @Benchmark
+    public void flattenHierarchy_ArrayList() {
+        for (Klass klass : klasses) {
+            arrayListLineage.lineage(klass);
         }
     }
 
-    static <T> List<LinkedList<T>> permutations(LinkedList<T> list) {
-        if (list.isEmpty()) {
-            return Collections.singletonList(list);
-        } else {
-            List<LinkedList<T>> permutations = new LinkedList<>();
-            List<T> priorElements = new LinkedList<>();
-            int i = 0;
-            for (T currentElement: list) {
-                if (!priorElements.contains(currentElement)) {
-                    LinkedList<T> listWithoutCurrentElement = new LinkedList<>(list);
-                    listWithoutCurrentElement.remove(i);
-                    for (List<T> perm : permutations(listWithoutCurrentElement)) {
-                        LinkedList<T> permutation = new LinkedList<>(perm);
-                        permutation.add(currentElement);
-                        permutations = new LinkedList<>(permutations);
-                        permutations.add(permutation);
-                    }
-                }
-                priorElements.add(currentElement);
-                i++;
-            }
-            return permutations;
+    @Benchmark
+    public void flattenHierarchy_LinkedList() {
+        for (Klass klass : klasses) {
+            linkedListLineage.lineage(klass);
         }
     }
 }
