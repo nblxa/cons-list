@@ -7,7 +7,10 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +43,7 @@ public class ConsListBenchmarkTest {
     @Test
     public void test_consList() {
         ConsListLineage consListLineage = new ConsListLineage();
-        for (Klass klass: klasses) {
+        for (Klass klass : klasses) {
             consListLineage.lineage(klass);
         }
         assertThat(consListLineage.lineage(identityLinkedList))
@@ -51,7 +54,7 @@ public class ConsListBenchmarkTest {
     @Test
     public void test_arrayList() {
         ArrayListLineage arrayListLineage = new ArrayListLineage();
-        for (Klass klass: klasses) {
+        for (Klass klass : klasses) {
             arrayListLineage.lineage(klass);
         }
         assertThat(arrayListLineage.lineage(identityLinkedList))
@@ -62,7 +65,7 @@ public class ConsListBenchmarkTest {
     @Test
     public void test_linkedList() {
         LinkedListLineage arrayListLineage = new LinkedListLineage();
-        for (Klass klass: klasses) {
+        for (Klass klass : klasses) {
             arrayListLineage.lineage(klass);
         }
         assertThat(arrayListLineage.lineage(identityLinkedList))
