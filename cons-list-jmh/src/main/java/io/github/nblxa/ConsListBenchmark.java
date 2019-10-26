@@ -81,16 +81,21 @@ public class ConsListBenchmark {
             arrayList, abstractSequentialList, linkedList, keepAliveStreamCleaner,
             identityLinkedList, abstractSet, hashSet, treeSet, consList));
 
+        Random rand = new Random(42L);
         for (int i = 0; i < 100_000; i++) {
-            Random rand = new Random(42L);
-            Klass randKlass = klasses.get(rand.nextInt(klasses.size()));
-            Klass newKlass = new Klass(randKlass.name() + ".r", randKlass);
+            int size = klasses.size();
+            Klass randKlass = klasses.get(rand.nextInt(size));
+            Klass newKlass = new Klass(randKlass.name() + "." + i, randKlass);
             klasses.add(newKlass);
         }
 
         consListLineage = new ConsListLineage();
         arrayListLineage = new ArrayListLineage();
         linkedListLineage = new LinkedListLineage();
+    }
+
+    List<Klass> klasses() {
+        return klasses;
     }
 
     @Benchmark

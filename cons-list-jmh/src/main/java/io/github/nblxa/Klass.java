@@ -5,18 +5,19 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 
 import java.util.Objects;
 
-public class Klass {
+public final class Klass {
     @NonNull
-    private String name;
+    private final String name;
     @Nullable
-    private Klass superKlass;
+    private final Klass superKlass;
 
     public Klass(@NonNull String name) {
         this.name = Objects.requireNonNull(name);
+        this.superKlass = null;
     }
 
     public Klass(@NonNull String name, @NonNull Klass superKlass) {
-        this(name);
+        this.name = Objects.requireNonNull(name);
         this.superKlass = Objects.requireNonNull(superKlass);
     }
 

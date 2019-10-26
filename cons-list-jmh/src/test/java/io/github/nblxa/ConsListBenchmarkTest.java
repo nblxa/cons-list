@@ -3,6 +3,7 @@ package io.github.nblxa;
 import io.github.nblxa.benchmark.ArrayListLineage;
 import io.github.nblxa.benchmark.ConsListLineage;
 import io.github.nblxa.benchmark.LinkedListLineage;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsListBenchmarkTest {
-    private static List<Klass> klasses;
+    private static Set<Klass> klasses;
     private static Klass object;
     private static Klass abstractCollection;
     private static Klass abstractList;
@@ -31,9 +32,9 @@ public class ConsListBenchmarkTest {
         Klass keepAliveStreamCleaner = new Klass("keepAliveStreamCleaner", linkedList);
         identityLinkedList = new Klass("identityLinkedList", abstractSequentialList);
         abstractSet = new Klass("abstractSet", abstractCollection);
-        klasses = Arrays.asList(object, string, abstractCollection, abstractList, arrayList,
-            abstractSequentialList, linkedList, keepAliveStreamCleaner, identityLinkedList,
-            abstractSet);
+        klasses = new HashSet<>(Arrays.asList(object, string, abstractCollection, abstractList,
+            arrayList, abstractSequentialList, linkedList, keepAliveStreamCleaner,
+            identityLinkedList, abstractSet));
     }
 
     @Test
@@ -67,5 +68,25 @@ public class ConsListBenchmarkTest {
         assertThat(arrayListLineage.lineage(identityLinkedList))
             .containsExactly(identityLinkedList, abstractSequentialList, abstractList,
                 abstractCollection, object);
+    }
+
+    @Test
+    public void test_equalsHashcode() {
+        EqualsVerifier.forClass(Klass.class)
+            .withPrefabValues(Klass.class,
+                new Klass("foo"), new Klass("bar", new Klass("baz")))
+            .verify();
+    }
+
+    @Test
+    public void test_setup() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setup();
+        List<Klass> klist = benchmark.klasses();
+        Set<Klass> kset = new HashSet<>(klist);
+        assertThat(klist)
+            .hasSize(100_013);
+        assertThat(kset)
+            .hasSize(100_013);
     }
 }
