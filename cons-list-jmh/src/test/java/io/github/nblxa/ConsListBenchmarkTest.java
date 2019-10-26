@@ -84,12 +84,61 @@ public class ConsListBenchmarkTest {
     @Test
     public void test_setup() {
         ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setKlassListSize(100);
         benchmark.setup();
         List<Klass> klist = benchmark.klasses();
         Set<Klass> kset = new HashSet<>(klist);
         assertThat(klist)
-            .hasSize(100_013);
+            .hasSize(113);
         assertThat(kset)
-            .hasSize(100_013);
+            .hasSize(113);
+    }
+
+    @Test
+    public void test_growConsList() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(15);
+        benchmark.grow_ConsList();
+        ConsList<Integer> list = benchmark.consList();
+        assertThat(list)
+            .hasSize(15);
+        assertThat(list)
+            .startsWith(0, 1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    public void test_growConsListReversed() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(15);
+        benchmark.grow_ConsList_reversed();
+        ConsList<Integer> list = benchmark.consList();
+        assertThat(list)
+            .hasSize(15);
+        assertThat(list)
+            .startsWith(0, 1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    public void test_growArrayList() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(15);
+        benchmark.grow_ArrayList();
+        List<Integer> list = benchmark.arrayList();
+        assertThat(list)
+            .hasSize(15);
+        assertThat(list)
+            .startsWith(0, 1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    public void test_growLinkedList() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(15);
+        benchmark.grow_LinkedList();
+        List<Integer> list = benchmark.linkedList();
+        assertThat(list)
+            .hasSize(15);
+        assertThat(list)
+            .startsWith(0, 1, 2, 3, 4, 5, 6);
     }
 }
