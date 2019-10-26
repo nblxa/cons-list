@@ -4,7 +4,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
-import static io.github.nblxa.ConsList.*;
+import static io.github.nblxa.ConsList.list;
+import static io.github.nblxa.ConsList.nil;
 
 public class ConsListEqualsTest {
 

@@ -3,7 +3,9 @@ package io.github.nblxa.benchmark;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.github.nblxa.Klass;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ArrayListLineage {
     @NonNull

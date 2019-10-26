@@ -31,10 +31,17 @@ import static java.util.Objects.requireNonNull;
 public class ConsList<E> extends AbstractCollection<E> implements Serializable {
     private static final long serialVersionUID = -2746754218342304128L;
     private static final ConsList NIL = new ConsList<Void>(null, null);
+    private final E head;
+    private final ConsList<E> tail;
+
+    private ConsList(E head, ConsList<E> tail) {
+        this.tail = tail;
+        this.head = head;
+    }
 
     /**
      * Returns the empty cons list.
-     *
+     * <p>
      * The result is a singleton instance shared by all empty cons lists.
      *
      * @param <T> element type
@@ -53,10 +60,10 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      *
      * <p>The original list is not modified.
      *
-     * @param head  first element of the new list
-     * @param tail  sublist of second and consecutive elements of the new list
-     * @param <V>   element type
-     * @return      a cons list with the given head and tail elements
+     * @param head first element of the new list
+     * @param tail sublist of second and consecutive elements of the new list
+     * @param <V>  element type
+     * @return a cons list with the given head and tail elements
      */
     @NonNull
     public static <V> ConsList<V> cons(@Nullable V head, @NonNull ConsList<V> tail) {
@@ -88,10 +95,10 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * @param <V>   element type of the resulting list: base class of both <tt>head</tt>
      *              and elements of <tt>tail</tt>
      * @param <U>   element type of the new list's head
-     * @return      a cons list with the given head and tail elements and of given element type
+     * @return a cons list with the given head and tail elements and of given element type
      */
     @NonNull
-    @SuppressWarnings({"unchecked", "unused"})
+    @SuppressWarnings( {"unchecked", "unused"})
     public static <V, U extends V> ConsList<V> cons(@Nullable U head,
                                                     @NonNull ConsList<? extends V> tail,
                                                     @NonNull Class<V> klass) {
@@ -107,9 +114,9 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * <p>With a non-empty parameter array, its first element is the head of the new cons list,
      * the rest are the parameters for constructing its tail.
      *
-     * @param elements  any number of elements of the list to be constructed
-     * @param <V>       element type
-     * @return          the cons list with the elements consList the argument array in the same order
+     * @param elements any number of elements of the list to be constructed
+     * @param <V>      element type
+     * @return the cons list with the elements consList the argument array in the same order
      */
     @NonNull
     @SafeVarargs
@@ -132,9 +139,9 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * <p>For all other {@link Iterable} types, this traverses both the Iterable
      * and the intermediate ConsList once.
      *
-     * @param iterable  input iterable
-     * @param <V>       element type
-     * @return          the cons list with the elements consList the Iterable in the same order
+     * @param iterable input iterable
+     * @param <V>      element type
+     * @return the cons list with the elements consList the Iterable in the same order
      */
     @NonNull
     public static <V> ConsList<V> consList(@NonNull Iterable<V> iterable) {
@@ -163,7 +170,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      *
      * @param lists argument cons lists, each of them not nullable
      * @param <V>   element type of all argument lists and the resulting list
-     * @return      the concatentation of all argument lists
+     * @return the concatentation of all argument lists
      */
     @NonNull
     @SafeVarargs
@@ -187,20 +194,13 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
 
     /**
      * Returns a {@link Collector} collecting a Stream into a cons list.
-     * @param <T>   element type
-     * @return      a collector collecting into a cons list
+     *
+     * @param <T> element type
+     * @return a collector collecting into a cons list
      */
     @NonNull
     public static <T> Collector<T, ?, ConsList<T>> toConsCollector() {
         return Collectors.collectingAndThen(Collectors.toList(), ConsList::consList);
-    }
-
-    private final E head;
-    private final ConsList<E> tail;
-
-    private ConsList(E head, ConsList<E> tail) {
-        this.tail = tail;
-        this.head = head;
     }
 
     /**
@@ -309,6 +309,11 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
         return result;
     }
 
+    // Method for tests.
+    int nilSize() {
+        return 0;
+    }
+
     private static final class ConsIterator<E> implements Iterator<E> {
         private ConsList<E> cons;
 
@@ -330,10 +335,5 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
             cons = cons.tail;
             return next;
         }
-    }
-
-    // Method for tests.
-    int nilSize() {
-        return 0;
     }
 }

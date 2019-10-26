@@ -40,13 +40,21 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 public class ConsListBenchmark {
+    private List<Klass> klasses;
+    private ConsListLineage consListLineage;
+    private ArrayListLineage arrayListLineage;
+    private LinkedListLineage linkedListLineage;
+
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
             .include(ConsListBenchmark.class.getSimpleName())
@@ -56,11 +64,6 @@ public class ConsListBenchmark {
             .build();
         new Runner(opt).run();
     }
-
-    private List<Klass> klasses;
-    private ConsListLineage consListLineage;
-    private ArrayListLineage arrayListLineage;
-    private LinkedListLineage linkedListLineage;
 
     @Setup
     public void setup() {
