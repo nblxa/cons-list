@@ -1,63 +1,92 @@
 package io.github.nblxa;
 
+import io.github.nblxa.benchmark.ArrayListLineage;
+import io.github.nblxa.benchmark.ConsListLineage;
+import io.github.nblxa.benchmark.LinkedListLineage;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-import static io.github.nblxa.ConsList.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsListBenchmarkTest {
+    private static Set<Klass> klasses;
+    private static Klass object;
+    private static Klass abstractCollection;
+    private static Klass abstractList;
+    private static Klass abstractSequentialList;
+    private static Klass identityLinkedList;
+    private static Klass abstractSet;
+
+    @BeforeClass
+    public static void setUpClass() {
+        object = new Klass("object");
+        Klass string = new Klass("string", object);
+        abstractCollection = new Klass("abstractCollection", object);
+        abstractList = new Klass("abstractList", abstractCollection);
+        Klass arrayList = new Klass("arrayList", abstractList);
+        abstractSequentialList = new Klass("abstractSequentialList", abstractList);
+        Klass linkedList = new Klass("linkedList", abstractSequentialList);
+        Klass keepAliveStreamCleaner = new Klass("keepAliveStreamCleaner", linkedList);
+        identityLinkedList = new Klass("identityLinkedList", abstractSequentialList);
+        abstractSet = new Klass("abstractSet", abstractCollection);
+        klasses = new HashSet<>(Arrays.asList(object, string, abstractCollection, abstractList,
+            arrayList, abstractSequentialList, linkedList, keepAliveStreamCleaner,
+            identityLinkedList, abstractSet));
+    }
+
     @Test
     public void test_consList() {
-        ConsList<ConsList<Integer>> perms = ConsListBenchmark.permutations(list(1, 2, 2, 3));
-        assertThat(perms)
-            .isNotEmpty()
-            .hasSize(12)
-            .containsExactlyInAnyOrder(
-                list(1, 2, 2, 3), list(2, 1, 2, 3), list(2, 2, 1, 3),
-                list(1, 2, 3, 2), list(2, 1, 3, 2), list(2, 2, 3, 1),
-                list(1, 3, 2, 2), list(2, 3, 1, 2), list(2, 3, 2, 1),
-                list(3, 1, 2, 2), list(3, 2, 1, 2), list(3, 2, 2, 1)
-            );
+        ConsListLineage consListLineage = new ConsListLineage();
+        for (Klass klass: klasses) {
+            consListLineage.lineage(klass);
+        }
+        assertThat(consListLineage.lineage(identityLinkedList))
+            .containsExactly(identityLinkedList, abstractSequentialList, abstractList,
+                abstractCollection, object);
     }
 
     @Test
     public void test_arrayList() {
-        List<ArrayList<Integer>> perms = ConsListBenchmark.permutations(arrList(1, 2, 2, 3));
-        assertThat(perms)
-            .isNotEmpty()
-            .hasSize(12)
-            .containsExactlyInAnyOrder(
-                arrList(1, 2, 2, 3), arrList(2, 1, 2, 3), arrList(2, 2, 1, 3),
-                arrList(1, 2, 3, 2), arrList(2, 1, 3, 2), arrList(2, 2, 3, 1),
-                arrList(1, 3, 2, 2), arrList(2, 3, 1, 2), arrList(2, 3, 2, 1),
-                arrList(3, 1, 2, 2), arrList(3, 2, 1, 2), arrList(3, 2, 2, 1)
-            );
+        ArrayListLineage arrayListLineage = new ArrayListLineage();
+        for (Klass klass: klasses) {
+            arrayListLineage.lineage(klass);
+        }
+        assertThat(arrayListLineage.lineage(identityLinkedList))
+            .containsExactly(identityLinkedList, abstractSequentialList, abstractList,
+                abstractCollection, object);
     }
 
     @Test
     public void test_linkedList() {
-        List<LinkedList<Integer>> perms = ConsListBenchmark.permutations(lnkList(1, 2, 2, 3));
-        assertThat(perms)
-            .isNotEmpty()
-            .hasSize(12)
-            .containsExactlyInAnyOrder(
-                lnkList(1, 2, 2, 3), lnkList(2, 1, 2, 3), lnkList(2, 2, 1, 3),
-                lnkList(1, 2, 3, 2), lnkList(2, 1, 3, 2), lnkList(2, 2, 3, 1),
-                lnkList(1, 3, 2, 2), lnkList(2, 3, 1, 2), lnkList(2, 3, 2, 1),
-                lnkList(3, 1, 2, 2), lnkList(3, 2, 1, 2), lnkList(3, 2, 2, 1)
-            );
+        LinkedListLineage arrayListLineage = new LinkedListLineage();
+        for (Klass klass: klasses) {
+            arrayListLineage.lineage(klass);
+        }
+        assertThat(arrayListLineage.lineage(identityLinkedList))
+            .containsExactly(identityLinkedList, abstractSequentialList, abstractList,
+                abstractCollection, object);
     }
 
-    private static ArrayList<Integer> arrList(Integer... ints) {
-        return new ArrayList<>(Arrays.asList(ints));
+    @Test
+    public void test_equalsHashcode() {
+        EqualsVerifier.forClass(Klass.class)
+            .withPrefabValues(Klass.class,
+                new Klass("foo"), new Klass("bar", new Klass("baz")))
+            .verify();
     }
 
-    private static LinkedList<Integer> lnkList(Integer... ints) {
-        return new LinkedList<>(Arrays.asList(ints));
+    @Test
+    public void test_setup() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setup();
+        List<Klass> klist = benchmark.klasses();
+        Set<Klass> kset = new HashSet<>(klist);
+        assertThat(klist)
+            .hasSize(100_013);
+        assertThat(kset)
+            .hasSize(100_013);
     }
 }
