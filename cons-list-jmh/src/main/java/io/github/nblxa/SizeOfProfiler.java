@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class SizeOfProfiler implements InternalProfiler {
-    private static Object rootObject;
+    private static Object rootObject = null;
     private static final SizeOf sizeOf = SizeOf.newInstance();
 
     static void setRootObject(Object rootObject) {

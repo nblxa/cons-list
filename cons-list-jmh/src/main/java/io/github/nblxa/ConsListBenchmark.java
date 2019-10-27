@@ -31,14 +31,14 @@
 
 package io.github.nblxa;
 
-import io.github.nblxa.benchmark.ArrayListLineage;
-import io.github.nblxa.benchmark.ConsListLineage;
-import io.github.nblxa.benchmark.LinkedListLineage;
+import io.github.nblxa.benchmark.*;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -50,14 +50,39 @@ import static io.github.nblxa.ConsList.nil;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 public class ConsListBenchmark {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsListBenchmark.class);
     private List<Klass> klasses;
-    private ConsListLineage consListLineage;
-    private ArrayListLineage arrayListLineage;
-    private LinkedListLineage linkedListLineage;
+    private ListLineage consListLineage;
+    private ListLineage arrayListLineage;
+    private ListLineage linkedListLineage;
     private ConsList<Integer> consList;
     private List<Integer> arrayList;
     private List<Integer> linkedList;
+
+    /**
+     * Size of the list of {@link Klass} objects that form the hierarchy to be flattened
+     * in the benchmarks:
+     *
+     * <ul>
+     * <li>{@link ConsListBenchmark#flattenHierarchy_ConsList}</li>
+     * <li>{@link ConsListBenchmark#flattenHierarchy_ArrayList}</li>
+     * <li>{@link ConsListBenchmark#flattenHierarchy_LinkedList}</li>
+     * </ul>
+     */
     private int klassListSize = 100_000;
+
+    /**
+     * Size of the list of integers to be constructed and iterated in benchmarks:
+     * <ul>
+     * <li>{@link ConsListBenchmark#grow_ConsList}</li>
+     * <li>{@link ConsListBenchmark#grow_ConsList_reversed}</li>
+     * <li>{@link ConsListBenchmark#grow_ArrayList}</li>
+     * <li>{@link ConsListBenchmark#grow_LinkedList}</li>
+     * <li>{@link ConsListBenchmark#iterate_ConsList}</li>
+     * <li>{@link ConsListBenchmark#iterate_ArrayList}</li>
+     * <li>{@link ConsListBenchmark#iterate_LinkedList}</li>
+     * </ul>
+     */
     private int growListSize = 1_000_000;
 
     public static void main(String[] args) throws RunnerException {
@@ -91,9 +116,9 @@ public class ConsListBenchmark {
             identityLinkedList, abstractSet, hashSet, treeSet, consList));
 
         Random rand = new Random(42L);
-        for (int i = 0; i < klassListSize; i++) {
-            int size = klasses.size();
-            Klass randKlass = klasses.get(rand.nextInt(size));
+        int klassesSize = klasses.size();
+        for (int i = 0; i < klassListSize - klassesSize; i++) {
+            Klass randKlass = klasses.get(rand.nextInt(klasses.size()));
             Klass newKlass = new Klass(randKlass.name() + "." + i, randKlass);
             klasses.add(newKlass);
         }
@@ -101,6 +126,11 @@ public class ConsListBenchmark {
         consListLineage = new ConsListLineage();
         arrayListLineage = new ArrayListLineage();
         linkedListLineage = new LinkedListLineage();
+
+        // set up the lists for the iteration test
+        grow_ConsList_reversed();
+        grow_ArrayList();
+        grow_LinkedList();
     }
 
     List<Klass> klasses() {
@@ -112,6 +142,7 @@ public class ConsListBenchmark {
         for (Klass klass : klasses) {
             consListLineage.lineage(klass);
         }
+        SizeOfProfiler.setRootObject(null);
     }
 
     @Benchmark
@@ -119,6 +150,7 @@ public class ConsListBenchmark {
         for (Klass klass : klasses) {
             arrayListLineage.lineage(klass);
         }
+        SizeOfProfiler.setRootObject(null);
     }
 
     @Benchmark
@@ -126,6 +158,7 @@ public class ConsListBenchmark {
         for (Klass klass : klasses) {
             linkedListLineage.lineage(klass);
         }
+        SizeOfProfiler.setRootObject(null);
     }
 
     @Benchmark
@@ -166,6 +199,45 @@ public class ConsListBenchmark {
         }
         this.linkedList = list;
         SizeOfProfiler.setRootObject(this.linkedList);
+    }
+
+    @Benchmark
+    public int iterate_ConsList() {
+        int sum = 0;
+        for (Integer i: consList) {
+            sum += i;
+        }
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.valueOf(sum));
+        }
+        SizeOfProfiler.setRootObject(null);
+        return sum;
+    }
+
+    @Benchmark
+    public int iterate_ArrayList() {
+        int sum = 0;
+        for (Integer i: arrayList) {
+            sum += i;
+        }
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.valueOf(sum));
+        }
+        SizeOfProfiler.setRootObject(null);
+        return sum;
+    }
+
+    @Benchmark
+    public int iterate_LinkedList() {
+        int sum = 0;
+        for (Integer i: linkedList) {
+            sum += i;
+        }
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.valueOf(sum));
+        }
+        SizeOfProfiler.setRootObject(null);
+        return sum;
     }
 
     public ConsList<Integer> consList() {

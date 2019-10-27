@@ -121,7 +121,7 @@ public class ConsListTest {
         Throwable t = catchThrowable(() -> cons("Peaches", null));
         assertThat(t)
             .isExactlyInstanceOf(NullPointerException.class)
-            .hasMessage("tail is null");
+            .hasMessage("iterable is null");
     }
 
     @Test
