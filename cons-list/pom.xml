@@ -10,8 +10,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cons-list</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Cons List: a production-grade immutable collection for use in recursive algorithms</description>
+    <url>http://github.com/nblxa/cons-list</url>
 
     <dependencies>
         <dependency>
