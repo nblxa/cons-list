@@ -1,4 +1,4 @@
-package io.github.nblxa;
+package io.github.nblxa.benchmark;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;

@@ -19,7 +19,7 @@ import static java.util.Objects.requireNonNull;
  * <p>Usage:
  *
  * <pre>
- * import static just.the.ConsList.*;
+ * import static io.github.nblxa.ConsList.*;
  * ...
  * ConsList&lt;String&gt; list = list(&quot;Apples&quot;, &quot;Oranges&quot;, &quot;Bananas&quot;);
  * list.forEach(fruit -&gt; System.out.println(&quot;I like &quot; + fruit);</pre>
@@ -61,13 +61,14 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * <p>The original list is not modified.
      *
      * @param head first element of the new list
-     * @param tail sublist of second and consecutive elements of the new list
+     * @param tail sublist of second and consecutive elements of the new list;
+     *             if it not of type <tt>ConsList</tt>, it will be converted
      * @param <V>  element type
      * @return a cons list with the given head and tail elements
      */
     @NonNull
-    public static <V> ConsList<V> cons(@Nullable V head, @NonNull ConsList<V> tail) {
-        return new ConsList<>(head, requireNonNull(tail, "tail is null"));
+    public static <V> ConsList<V> cons(@Nullable V head, @NonNull Collection<V> tail) {
+        return new ConsList<>(head, consList(tail));
     }
 
     /**
@@ -89,7 +90,8 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * <p>The original list is not modified.
      *
      * @param head  first element of the new list
-     * @param tail  sublist of second and consecutive elements of the new list
+     * @param tail  sublist of second and consecutive elements of the new list;
+     *              if it not of type <tt>ConsList</tt>, it will be converted
      * @param klass type-evidence parameter, unused at runtime, and only required
      *              to provide static type binding at compile-time
      * @param <V>   element type of the resulting list: base class of both <tt>head</tt>
@@ -100,9 +102,9 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
     @NonNull
     @SuppressWarnings( {"unchecked", "unused"})
     public static <V, U extends V> ConsList<V> cons(@Nullable U head,
-                                                    @NonNull ConsList<? extends V> tail,
+                                                    @NonNull Collection<? extends V> tail,
                                                     @NonNull Class<V> klass) {
-        return (ConsList<V>) new ConsList(head, requireNonNull(tail, "tail is null"));
+        return (ConsList<V>) new ConsList(head, consList(tail));
     }
 
     /**
@@ -129,7 +131,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
     }
 
     /**
-     * Constructs a new cons list consList the given {@link Iterable}.
+     * Constructs a new <tt>ConsList</tt> from the given {@link Iterable}.
      *
      * <p>If the {@link Iterable} is itself a ConsList, returns the typecast iterable.
      *

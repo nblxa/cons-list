@@ -68,7 +68,7 @@ you can use [JitPack](https://jitpack.io):
 Static imports for ease of use:
 
 ```java
-import static just.the.ConsList.*;
+import static io.github.nblxa.ConsList.*;
 ```
 
 Create an empty Cons list:
@@ -107,7 +107,27 @@ such as `ArrayList`.
 
 See [ConsListBenchmark.java](cons-list-jmh/src/main/java/io/github/nblxa/ConsListBenchmark.java).
 
-To run it on your machine, build the project and run:
+Specific problems like flattening a tree-like hierarchical structure can be
+solved more performantly with `ConsList`, however the trivial list-growth and
+iteration operations are more performant using `java.util.ArrayList`.
+
+Here are the benchmark results on the author's machine:
+
+Benchmark | Collection | Avg time, ms
+--------- | ---------- | ----:
+Flatten a hierarchy | io.github.nblxa.ConsList | 30,090
+Flatten a hierarchy | java.util.ArrayList | 74,186
+Flatten a hierarchy | java.util.LinkedList | 107,474
+Grow a list | io.github.nblxa.ConsList | 39,448
+Grow a list | java.util.ArrayList | 9,192
+Grow a list | java.util.LinkedList | 14,279
+Iterate | io.github.nblxa.ConsList | 4,542
+Iterate | java.util.ArrayList | 1,753
+Iterate | java.util.LinkedList | 4,213
+
+The benchmark is written with [JMH](https://openjdk.java.net/projects/code-tools/jmh/).
+To test the performance on your machine, build the project and run:
 ```bash
 java -jar cons-list-jmh/target/benchmarks.jar
 ```
+
