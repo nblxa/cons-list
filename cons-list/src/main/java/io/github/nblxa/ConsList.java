@@ -41,8 +41,10 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
 
     /**
      * Returns the empty cons list.
-     * <p>
-     * The result is a singleton instance shared by all empty cons lists.
+     *
+     * <p>The result is a singleton instance shared by all empty cons lists.
+     *
+     * <p><tt>tail</tt> collection, if not of type <tt>ConsList</tt>, will be converted to it.
      *
      * @param <T> element type
      * @return singleton empty list
@@ -61,8 +63,26 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * <p>The original list is not modified.
      *
      * @param head first element of the new list
-     * @param tail sublist of second and consecutive elements of the new list;
-     *             if it not of type <tt>ConsList</tt>, it will be converted
+     * @param tail <tt>ConsList</tt> with the second and consecutive elements of the new list
+     * @param <V>  element type
+     * @return a cons list with the given head and tail elements
+     */
+    @NonNull
+    public static <V> ConsList<V> cons(@Nullable V head, @NonNull ConsList<V> tail) {
+        return new ConsList<>(head, Objects.requireNonNull(tail, "tail is null"));
+    }
+
+    /**
+     * Constructs a new cons list with elements <tt>head</tt> and <tt>tail</tt>.
+     *
+     * <p>The head, the tail elements and the resulting list have the same compile-time type.
+     *
+     * <p><tt>tail</tt> collection, if not of type <tt>ConsList</tt>, will be converted to it.
+     *
+     * <p>The original list is not modified.
+     *
+     * @param head first element of the new list
+     * @param tail collection of second and consecutive elements of the new list;
      * @param <V>  element type
      * @return a cons list with the given head and tail elements
      */
@@ -90,7 +110,42 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
      * <p>The original list is not modified.
      *
      * @param head  first element of the new list
-     * @param tail  sublist of second and consecutive elements of the new list;
+     * @param tail  <tt>ConsList</tt> with the second and consecutive elements of the new list
+     * @param klass type-evidence parameter, unused at runtime, and only required
+     *              to provide static type binding at compile-time
+     * @param <V>   element type of the resulting list: base class of both <tt>head</tt>
+     *              and elements of <tt>tail</tt>
+     * @param <U>   element type of the new list's head
+     * @return a cons list with the given head and tail elements and of given element type
+     */
+    @NonNull
+    @SuppressWarnings( {"unchecked", "unused"})
+    public static <V, U extends V> ConsList<V> cons(@Nullable U head,
+                                                    @NonNull ConsList<? extends V> tail,
+                                                    @NonNull Class<V> klass) {
+        return (ConsList<V>) new ConsList(head, Objects.requireNonNull(tail, "tail is null"));
+    }
+
+    /**
+     * Constructs a new cons list of element type <tt>klass</tt> with elements <tt>head</tt>
+     * and <tt>tail</tt>.
+     *
+     * <p>The head, the tail elements and the resulting list have the same compile-time type
+     * defined by the parameter <tt>klass</tt>. This type must be the common supertype
+     * of both the new head element and the elements of the tail. The parameter is required
+     * to overcome the deficiencies of the Java generics and type inference in JDK 8.
+     *
+     * <p>This works without the explicit type parameter:
+     * <pre>ConsList&lt;Number&gt; l = cons(3.14d, cons(10, nil()));</pre>
+     *
+     * <p>But this requires it:
+     * <pre>ConsList&lt;Integer&gt; l = cons(10, nil());
+     *     ConsList&lt;Number&gt; l = cons(3.14d, i, Number.class);</pre>
+     *
+     * <p>The original list is not modified.
+     *
+     * @param head  first element of the new list
+     * @param tail  collection of second and consecutive elements of the new list;
      *              if it not of type <tt>ConsList</tt>, it will be converted
      * @param klass type-evidence parameter, unused at runtime, and only required
      *              to provide static type binding at compile-time
@@ -125,7 +180,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
     public static <V> ConsList<V> list(@NonNull V... elements) {
         ConsList<V> cons = nil();
         for (int i = elements.length - 1; i >= 0; i--) {
-            cons = cons(elements[i], cons);
+            cons = new ConsList<>(elements[i], cons);
         }
         return cons;
     }
@@ -156,12 +211,12 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
             List<V> list = (List<V>) iterable;
             ListIterator<V> iter = list.listIterator(list.size());
             while (iter.hasPrevious()) {
-                cons = cons(iter.previous(), cons);
+                cons = new ConsList<>(iter.previous(), cons);
             }
             return cons;
         } else {
             for (V v : iterable) {
-                cons = cons(v, cons);
+                cons = new ConsList<>(v, cons);
             }
             return cons.reverse();
         }
@@ -187,7 +242,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
             ConsList<V> cons = requireNonNull(lists[i], "Null argument at position " + i)
                 .reverse();
             while (cons.tail != null) {
-                result = cons(cons.head, result);
+                result = new ConsList<>(cons.head, result);
                 cons = cons.tail;
             }
         }
@@ -245,7 +300,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
         ConsList<E> result = nil();
         ConsList<E> cons = this;
         while (cons.tail != null) {
-            result = cons(cons.head, result);
+            result = new ConsList<>(cons.head, result);
             cons = cons.tail;
         }
         return result;
