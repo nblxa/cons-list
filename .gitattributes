@@ -16,3 +16,6 @@ mvnw            text
 
 # Declare files that will always have CRLF line endings on checkout.
 *.cmd           text eol=crlf
+
+# Encrypted Travis files
+*.enc           binary
