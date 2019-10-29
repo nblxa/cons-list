@@ -94,6 +94,25 @@ public class ConsListTest {
     }
 
     @Test
+    public void cons_withTypeInferenceCollection() {
+        ConsList<Number> n = cons(3.14d, Arrays.asList(10, 11));
+        assertThat(n)
+            .containsExactly(3.14d, 10, 11)
+            .hasSize(3)
+            .isNotEmpty();
+    }
+
+    @Test
+    public void cons_withExplicitTypeCollection() {
+        Collection<Integer> i = Arrays.asList(10, 12);
+        ConsList<Number> n = cons(3.14d, i, Number.class);
+        assertThat(n)
+            .containsExactly(3.14d, 10, 12)
+            .hasSize(3)
+            .isNotEmpty();
+    }
+
+    @Test
     public void list_withoutParameters_isNil() {
         assertThat(list()).isEqualTo(nil());
     }
@@ -118,7 +137,35 @@ public class ConsListTest {
 
     @Test
     public void cons_withNullTail_throwsException() {
-        Throwable t = catchThrowable(() -> cons("Peaches", null));
+        ConsList<String> cnslst = null;
+        Throwable t = catchThrowable(() -> cons("Peaches", cnslst));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasMessage("tail is null");
+    }
+
+    @Test
+    public void cons_withNullTailCollection_throwsException() {
+        Collection<String> coll = null;
+        Throwable t = catchThrowable(() -> cons("Peaches", coll));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasMessage("iterable is null");
+    }
+
+    @Test
+    public void cons_withClassAndNullTail_throwsException() {
+        ConsList<String> cnslst = null;
+        Throwable t = catchThrowable(() -> cons("Peaches", cnslst, String.class));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasMessage("tail is null");
+    }
+
+    @Test
+    public void cons_withClassAndNullTailCollection_throwsException() {
+        Collection<String> coll = null;
+        Throwable t = catchThrowable(() -> cons("Peaches", coll, String.class));
         assertThat(t)
             .isExactlyInstanceOf(NullPointerException.class)
             .hasMessage("iterable is null");
