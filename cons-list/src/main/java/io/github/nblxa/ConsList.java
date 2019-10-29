@@ -125,7 +125,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
     public static <V> ConsList<V> list(@NonNull V... elements) {
         ConsList<V> cons = nil();
         for (int i = elements.length - 1; i >= 0; i--) {
-            cons = cons(elements[i], cons);
+            cons = new ConsList<>(elements[i], cons);
         }
         return cons;
     }
@@ -156,12 +156,12 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
             List<V> list = (List<V>) iterable;
             ListIterator<V> iter = list.listIterator(list.size());
             while (iter.hasPrevious()) {
-                cons = cons(iter.previous(), cons);
+                cons = new ConsList<>(iter.previous(), cons);
             }
             return cons;
         } else {
             for (V v : iterable) {
-                cons = cons(v, cons);
+                cons = new ConsList<>(v, cons);
             }
             return cons.reverse();
         }
@@ -187,7 +187,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
             ConsList<V> cons = requireNonNull(lists[i], "Null argument at position " + i)
                 .reverse();
             while (cons.tail != null) {
-                result = cons(cons.head, result);
+                result = new ConsList<>(cons.head, result);
                 cons = cons.tail;
             }
         }
@@ -245,7 +245,7 @@ public class ConsList<E> extends AbstractCollection<E> implements Serializable {
         ConsList<E> result = nil();
         ConsList<E> cons = this;
         while (cons.tail != null) {
-            result = cons(cons.head, result);
+            result = new ConsList<>(cons.head, result);
             cons = cons.tail;
         }
         return result;
