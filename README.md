@@ -18,8 +18,7 @@ than `Integer.MAX_VALUE` elements and will produce an overhead of two
 object references per element.
 
 Collection methods are implemented:
-* `size()` iterates through the list and correctly handles lists with
-  more than `Integer.MAX_VALUE` elements.
+* `size()` iterates through the list to avoid storing list length
 * `isEmpty()` does not try to calculate the size to see if it is 0.
 
 Java 8 Streams support:
@@ -42,26 +41,15 @@ and Streams API.
 
 ## Maven
 
-No releases exists at the moment, and the project is not published to Maven
-Central. If you still want to use the current `SNAPSHOT` version as a dependency,
-you can use [JitPack](https://jitpack.io):
-
-```xml
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-```
-
 ```xml
 <dependency>
-    <groupId>com.github.nblxa</groupId>
+    <groupId>io.github.nblxa</groupId>
     <artifactId>cons-list</artifactId>
-    <version>master-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
+
+The library uses [Semantic Versioning](https://semver.org).
 
 ## Usage
 

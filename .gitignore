@@ -30,5 +30,5 @@ hs_err_pid*
 # flattened pom.xml generated at build time
 **/.flattened-pom.xml
 
-# decrypted maven settings files
-**/settings*.xml
+# Maven versions plugin backup
+**/*.versionsBackup
