@@ -51,7 +51,7 @@
         <coveralls.maven.plugin.version>4.3.0</coveralls.maven.plugin.version>
         <pitest.version>1.4.10</pitest.version>
         <jmh.version>1.21</jmh.version>
-        <slf4j.simple.version>1.7.28</slf4j.simple.version>
+        <slf4j.simple.version>1.7.29</slf4j.simple.version>
         <sizeof.version>0.3.0</sizeof.version>
         <maven.clean.plugin.version>3.1.0</maven.clean.plugin.version>
         <maven.deploy.plugin.version>3.0.0-M1</maven.deploy.plugin.version>
