@@ -18,4 +18,5 @@ deploy:
   provider: script
   script: scripts/deploy.sh
   on:
-    branch: master
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^(master|release/[0-9]+)$
