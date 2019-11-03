@@ -1,3 +1,4 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.nblxa/cons-list/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.nblxa/cons-list)
 [![Build Status](https://travis-ci.com/nblxa/cons-list.svg?branch=master)](https://travis-ci.com/nblxa/cons-list)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cons-list&metric=alert_status)](https://sonarcloud.io/dashboard?id=cons-list)
 [![Coverage Status](https://coveralls.io/repos/github/nblxa/cons-list/badge.svg?branch=master)](https://coveralls.io/github/nblxa/cons-list?branch=master)
