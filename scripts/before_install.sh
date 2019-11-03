@@ -18,3 +18,4 @@ if [ -f ~/.gnupg/gpg-agent.conf ]; then
   chmod 600 ~/.gnupg/gpg-agent.conf
 fi
 echo "allow-loopback-pinentry" | cat >> ~/.gnupg/gpg-agent.conf
+gpg-connect-agent reloadagent /bye
