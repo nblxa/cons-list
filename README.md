@@ -8,8 +8,8 @@
 This repository contains just one Java class of production code:
 [ConsList.java](cons-list/src/main/java/io/github/nblxa/ConsList.java).
 
-It is the ultimate thread-safe and immutable Cons List implementation
-in Java that implements the `java.util.Collection` interface, giving
+It is the ultimate thread-safe and immutable implementation of singly-linked
+Cons List in Java that implements the `java.util.Collection` interface, giving
 the programmers the access to all its methods such as `stream()`,
 `toString()` and others.
 
@@ -70,6 +70,12 @@ Create a list of an arbitrary length:
 
 ```java
 Collection<String> strings = list("Hello", "functional", "programming", "!");
+```
+
+Adding new elements to a list is just creating new immutable lists:
+
+```java
+Collection<String> strings2 = cons("ConsList", cons("says:", strings));
 ```
 
 Note that since Cons List is immutable, it must be initialized with elements
