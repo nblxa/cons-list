@@ -1,12 +1,14 @@
-package io.github.nblxa;
+package io.github.nblxa.cons;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-import static io.github.nblxa.ConsList.*;
+import static io.github.nblxa.cons.ConsList.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
@@ -52,15 +54,21 @@ public class ConsListTest {
     }
 
     @Test
-    public void stream_join() {
-        ConsList<String> strings = list("Hello", "functional", "programming", "!");
-        String joined = strings.stream()
-            .collect(Collectors.joining(" "));
-        assertThat(joined).isEqualTo("Hello functional programming !");
+    public void iterator() {
+        Iterator<Integer> iter = list(42, 13, 1).iterator();
+        assertThat(iter.hasNext()).isTrue();
+        assertThat(iter.next()).isEqualTo(42);
+        assertThat(iter.hasNext()).isTrue();
+        assertThat(iter.next()).isEqualTo(13);
+        assertThat(iter.hasNext()).isTrue();
+        assertThat(iter.next()).isEqualTo(1);
+        assertThat(iter.hasNext()).isFalse();
+        Throwable t = catchThrowable(iter::next);
+        assertThat(t).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
-    public void spliterator_hasCharacteristics() {
+    public void spliterator_characteristicsAndData() {
         ConsList<String> strings = list("Hello", "functional", "programming", "!");
         Spliterator<String> spliter = strings.spliterator();
 
@@ -72,6 +80,11 @@ public class ConsListTest {
         assertThat(spliter.hasCharacteristics(Spliterator.IMMUTABLE)).isTrue();
         assertThat(spliter.hasCharacteristics(Spliterator.CONCURRENT)).isFalse();
         assertThat(spliter.hasCharacteristics(Spliterator.SUBSIZED)).isFalse();
+
+        List<String> list = StreamSupport.stream(spliter, false)
+            .collect(Collectors.toList());
+        assertThat(list)
+            .containsExactly("Hello", "functional", "programming", "!");
     }
 
     @Test
@@ -183,19 +196,19 @@ public class ConsListTest {
             .hasNoCause();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void hugeList_hasSizeIntMaxValue() {
         ConsList<Integer> bs = cons(3, cons(2, cons(1, nil())));
 
-        ConsList<Integer> spyCons = Mockito.spy(bs);
-        Mockito.doReturn(Integer.MAX_VALUE - 1)
-            .when(spyCons)
-            .nilSize();
-
-        assertThat(spyCons)
-            .isNotEmpty()
-            .hasSize(Integer.MAX_VALUE);
+        int priorValue = ConsUtil.EMPTY_SIZE;
+        ConsUtil.EMPTY_SIZE = Integer.MAX_VALUE - 1;
+        try {
+            assertThat(bs)
+                .isNotEmpty()
+                .hasSize(Integer.MAX_VALUE);
+        } finally {
+            ConsUtil.EMPTY_SIZE = priorValue;
+        }
     }
 
     @Test
@@ -255,16 +268,8 @@ public class ConsListTest {
     }
 
     @Test
-    public void concat_none_yieldsNil() {
-        assertThat(concat())
-            .isEqualTo(nil())
-            .hasSize(0)
-            .isEmpty();
-    }
-
-    @Test
     public void concat_one_yieldsSelf() {
-        ConsList<String> input = concat(list("There", "must", "be", "only", "one!"));
+        ConsList<String> input = list("There", "must", "be", "only", "one!");
         assertThat(concat(input) == input).isTrue();
     }
 
@@ -277,20 +282,30 @@ public class ConsListTest {
 
     @Test
     public void concat_oneNullVararg_throwsException() {
-        Throwable t = catchThrowable(() -> concat(null));
+        ConsList<Integer>[] nullList = null;
+        Throwable t = catchThrowable(() -> concat(list(1), nullList));
         assertThat(t)
             .isExactlyInstanceOf(NullPointerException.class)
             .hasNoCause()
-            .hasMessage("Argument array lists is null");
+            .hasMessage("Argument array rest is null");
     }
 
     @Test
     public void concat_lastNullListArg_throwsException() {
-        Throwable t = catchThrowable(() -> concat(list(1, 2), null));
+        Throwable t = catchThrowable(() -> concat(list(1, 2), list(3), null));
         assertThat(t)
             .isExactlyInstanceOf(NullPointerException.class)
             .hasNoCause()
-            .hasMessage("Null argument at position 1");
+            .hasMessage("Null concat argument at position 2");
+    }
+
+    @Test
+    public void concat_nullInListArg_throwsException() {
+        Throwable t = catchThrowable(() -> concat(list(1, 2), null, list(3)));
+        assertThat(t)
+            .isExactlyInstanceOf(NullPointerException.class)
+            .hasNoCause()
+            .hasMessage("Null concat argument at position 1");
     }
 
     @Test
@@ -299,7 +314,7 @@ public class ConsListTest {
         assertThat(t)
             .isExactlyInstanceOf(NullPointerException.class)
             .hasNoCause()
-            .hasMessage("Null argument at position 0");
+            .hasMessage("Null concat argument at position 0");
     }
 
     @Test
@@ -322,5 +337,22 @@ public class ConsListTest {
             .hasSize(3)
             .isNotEmpty()
             .containsExactly("Apples", "Pears", "Oranges");
+    }
+
+    @Test
+    public void consUtil() throws NoSuchMethodException {
+        Constructor<ConsUtil> constructor = ConsUtil.class.getDeclaredConstructor();
+        boolean isAccessible = constructor.isAccessible();
+        try {
+            constructor.setAccessible(true);
+            Throwable t = catchThrowable(constructor::newInstance);
+            assertThat(t).isInstanceOf(InvocationTargetException.class)
+                .hasCauseExactlyInstanceOf(UnsupportedOperationException.class)
+                .hasRootCauseMessage(null);
+        } finally {
+            if (!isAccessible) {
+                constructor.setAccessible(false);
+            }
+        }
     }
 }

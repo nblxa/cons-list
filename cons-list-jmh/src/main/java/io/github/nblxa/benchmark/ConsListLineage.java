@@ -1,12 +1,12 @@
 package io.github.nblxa.benchmark;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import io.github.nblxa.ConsList;
+import io.github.nblxa.cons.ConsList;
 
 import java.util.Collection;
 
-import static io.github.nblxa.ConsList.cons;
-import static io.github.nblxa.ConsList.nil;
+import static io.github.nblxa.cons.ConsList.cons;
+import static io.github.nblxa.cons.ConsList.nil;
 
 public class ConsListLineage implements ListLineage {
     @Override

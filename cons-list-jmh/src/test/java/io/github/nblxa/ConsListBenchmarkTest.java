@@ -1,11 +1,11 @@
 package io.github.nblxa;
 
 import io.github.nblxa.benchmark.*;
+import io.github.nblxa.cons.ConsList;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,29 +13,19 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsListBenchmarkTest {
-    private static Set<Klass> klasses;
     private static Klass object;
     private static Klass abstractCollection;
     private static Klass abstractList;
     private static Klass abstractSequentialList;
     private static Klass identityLinkedList;
-    private static Klass abstractSet;
 
     @BeforeClass
     public static void setUpClass() {
         object = new Klass("object");
-        Klass string = new Klass("string", object);
         abstractCollection = new Klass("abstractCollection", object);
         abstractList = new Klass("abstractList", abstractCollection);
-        Klass arrayList = new Klass("arrayList", abstractList);
         abstractSequentialList = new Klass("abstractSequentialList", abstractList);
-        Klass linkedList = new Klass("linkedList", abstractSequentialList);
-        Klass keepAliveStreamCleaner = new Klass("keepAliveStreamCleaner", linkedList);
         identityLinkedList = new Klass("identityLinkedList", abstractSequentialList);
-        abstractSet = new Klass("abstractSet", abstractCollection);
-        klasses = new HashSet<>(Arrays.asList(object, string, abstractCollection, abstractList,
-            arrayList, abstractSequentialList, linkedList, keepAliveStreamCleaner,
-            identityLinkedList, abstractSet));
     }
 
     @Test
@@ -84,34 +74,10 @@ public class ConsListBenchmarkTest {
     }
 
     @Test
-    public void test_growConsList() {
-        ConsListBenchmark benchmark = new ConsListBenchmark();
-        benchmark.setGrowListSize(13);
-        benchmark.grow_ConsList();
-        ConsList<Integer> list = benchmark.consList();
-        assertThat(list)
-            .hasSize(13);
-        assertThat(list)
-            .startsWith(0, 1, 2, 3, 4, 5, 6);
-    }
-
-    @Test
-    public void test_growConsListReversed() {
-        ConsListBenchmark benchmark = new ConsListBenchmark();
-        benchmark.setGrowListSize(14);
-        benchmark.grow_ConsList_reversed();
-        ConsList<Integer> list = benchmark.consList();
-        assertThat(list)
-            .hasSize(14);
-        assertThat(list)
-            .startsWith(0, 1, 2, 3, 4, 5, 6);
-    }
-
-    @Test
     public void test_growArrayList() {
         ConsListBenchmark benchmark = new ConsListBenchmark();
         benchmark.setGrowListSize(15);
-        benchmark.grow_ArrayList();
+        benchmark.growArrayList();
         List<Integer> list = benchmark.arrayList();
         assertThat(list)
             .hasSize(15);
@@ -123,10 +89,58 @@ public class ConsListBenchmarkTest {
     public void test_growLinkedList() {
         ConsListBenchmark benchmark = new ConsListBenchmark();
         benchmark.setGrowListSize(16);
-        benchmark.grow_LinkedList();
+        benchmark.growLinkedList();
         List<Integer> list = benchmark.linkedList();
         assertThat(list)
             .hasSize(16);
+        assertThat(list)
+            .startsWith(0, 1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    public void test_growConsList() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(13);
+        benchmark.growConsList();
+        ConsList<Integer> list = benchmark.consList();
+        assertThat(list)
+            .hasSize(13);
+        assertThat(list)
+            .startsWith(0, 1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    public void test_growConsListReverseInputOrder() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(13);
+        benchmark.growConsListReverseInputOrder();
+        ConsList<Integer> list = benchmark.consList();
+        assertThat(list)
+            .hasSize(13);
+        assertThat(list)
+            .startsWith(0, 1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    public void test_growIntConsList() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(13);
+        benchmark.growIntConsList();
+        ConsList<Integer> list = benchmark.intConsList();
+        assertThat(list)
+            .hasSize(13);
+        assertThat(list)
+            .startsWith(0, 1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    public void test_growIntConsListReverseInputOrder() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(13);
+        benchmark.growIntConsListReverseInputOrder();
+        ConsList<Integer> list = benchmark.intConsList();
+        assertThat(list)
+            .hasSize(13);
         assertThat(list)
             .startsWith(0, 1, 2, 3, 4, 5, 6);
     }
@@ -136,7 +150,7 @@ public class ConsListBenchmarkTest {
         ConsListBenchmark benchmark = new ConsListBenchmark();
         benchmark.setGrowListSize(15);
         benchmark.setup();
-        int sum = benchmark.iterate_ConsList();
+        int sum = benchmark.iterateConsList();
         assertThat(sum)
             .isEqualTo(105);
     }
@@ -146,7 +160,7 @@ public class ConsListBenchmarkTest {
         ConsListBenchmark benchmark = new ConsListBenchmark();
         benchmark.setGrowListSize(10);
         benchmark.setup();
-        int sum = benchmark.iterate_ArrayList();
+        int sum = benchmark.iterateArrayList();
         assertThat(sum)
             .isEqualTo(45);
     }
@@ -156,8 +170,18 @@ public class ConsListBenchmarkTest {
         ConsListBenchmark benchmark = new ConsListBenchmark();
         benchmark.setGrowListSize(11);
         benchmark.setup();
-        int sum = benchmark.iterate_LinkedList();
+        int sum = benchmark.iterateLinkedList();
         assertThat(sum)
             .isEqualTo(55);
+    }
+
+    @Test
+    public void test_iterateIntConsList() {
+        ConsListBenchmark benchmark = new ConsListBenchmark();
+        benchmark.setGrowListSize(15);
+        benchmark.setup();
+        int sum = benchmark.iterateIntConsList();
+        assertThat(sum)
+            .isEqualTo(105);
     }
 }
