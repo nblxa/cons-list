@@ -32,19 +32,22 @@
 package io.github.nblxa;
 
 import io.github.nblxa.benchmark.*;
+import io.github.nblxa.cons.ConsList;
+import io.github.nblxa.cons.IntConsList;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static io.github.nblxa.ConsList.cons;
-import static io.github.nblxa.ConsList.nil;
+import static io.github.nblxa.cons.ConsList.*;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -56,6 +59,7 @@ public class ConsListBenchmark {
     private ListLineage arrayListLineage;
     private ListLineage linkedListLineage;
     private ConsList<Integer> consList;
+    private IntConsList<Integer> intConsList;
     private List<Integer> arrayList;
     private List<Integer> linkedList;
 
@@ -64,9 +68,9 @@ public class ConsListBenchmark {
      * in the benchmarks:
      *
      * <ul>
-     * <li>{@link ConsListBenchmark#flattenHierarchy_ConsList}</li>
-     * <li>{@link ConsListBenchmark#flattenHierarchy_ArrayList}</li>
-     * <li>{@link ConsListBenchmark#flattenHierarchy_LinkedList}</li>
+     * <li>{@link ConsListBenchmark#flattenHierarchyConsList}</li>
+     * <li>{@link ConsListBenchmark#flattenHierarchyArrayList}</li>
+     * <li>{@link ConsListBenchmark#flattenHierarchyLinkedList}</li>
      * </ul>
      */
     private int klassListSize = 100_000;
@@ -74,25 +78,41 @@ public class ConsListBenchmark {
     /**
      * Size of the list of integers to be constructed and iterated in benchmarks:
      * <ul>
-     * <li>{@link ConsListBenchmark#grow_ConsList}</li>
-     * <li>{@link ConsListBenchmark#grow_ConsList_reversed}</li>
-     * <li>{@link ConsListBenchmark#grow_ArrayList}</li>
-     * <li>{@link ConsListBenchmark#grow_LinkedList}</li>
-     * <li>{@link ConsListBenchmark#iterate_ConsList}</li>
-     * <li>{@link ConsListBenchmark#iterate_ArrayList}</li>
-     * <li>{@link ConsListBenchmark#iterate_LinkedList}</li>
+     * <li>{@link ConsListBenchmark#growConsList}</li>
+     * <li>{@link ConsListBenchmark#growConsListReverseInputOrder}</li>
+     * <li>{@link ConsListBenchmark#growIntConsList}</li>
+     * <li>{@link ConsListBenchmark#growIntConsListReverseInputOrder}</li>
+     * <li>{@link ConsListBenchmark#growArrayList}</li>
+     * <li>{@link ConsListBenchmark#growLinkedList}</li>
+     * <li>{@link ConsListBenchmark#iterateConsList}</li>
+     * <li>{@link ConsListBenchmark#iterateIntConsList}</li>
+     * <li>{@link ConsListBenchmark#iterateArrayList}</li>
+     * <li>{@link ConsListBenchmark#iterateLinkedList}</li>
      * </ul>
      */
     private int growListSize = 1_000_000;
 
     public static void main(String[] args) throws RunnerException {
-        Options opt = new OptionsBuilder()
+        final List<String> exclude;
+        if (args.length > 0 && args[0].equals("cons")) {
+            exclude = Arrays.asList("^.*ArrayList.*$", "^.*LinkedList.*$");
+        } else {
+            exclude = Collections.emptyList();
+        }
+
+        ChainedOptionsBuilder optBuilder = new OptionsBuilder()
             .include(ConsListBenchmark.class.getSimpleName())
             .addProfiler("gc")
             .addProfiler(SizeOfProfiler.class)
             .warmupIterations(3)
             .forks(2)
-            .build();
+            .warmupTime(TimeValue.seconds(5L))
+            .measurementTime(TimeValue.seconds(5L));
+        for (String ex: exclude) {
+            optBuilder = optBuilder.exclude(ex);
+        }
+        Options opt = optBuilder.build();
+
         new Runner(opt).run();
     }
 
@@ -128,9 +148,10 @@ public class ConsListBenchmark {
         linkedListLineage = new LinkedListLineage();
 
         // set up the lists for the iteration test
-        grow_ConsList_reversed();
-        grow_ArrayList();
-        grow_LinkedList();
+        growConsListReverseInputOrder();
+        growArrayList();
+        growLinkedList();
+        growIntConsListReverseInputOrder();
     }
 
     List<Klass> klasses() {
@@ -138,7 +159,7 @@ public class ConsListBenchmark {
     }
 
     @Benchmark
-    public void flattenHierarchy_ConsList() {
+    public void flattenHierarchyConsList() {
         for (Klass klass : klasses) {
             consListLineage.lineage(klass);
         }
@@ -146,7 +167,7 @@ public class ConsListBenchmark {
     }
 
     @Benchmark
-    public void flattenHierarchy_ArrayList() {
+    public void flattenHierarchyArrayList() {
         for (Klass klass : klasses) {
             arrayListLineage.lineage(klass);
         }
@@ -154,7 +175,7 @@ public class ConsListBenchmark {
     }
 
     @Benchmark
-    public void flattenHierarchy_LinkedList() {
+    public void flattenHierarchyLinkedList() {
         for (Klass klass : klasses) {
             linkedListLineage.lineage(klass);
         }
@@ -162,27 +183,7 @@ public class ConsListBenchmark {
     }
 
     @Benchmark
-    public void grow_ConsList() {
-        ConsList<Integer> list = nil();
-        for (int i = 0; i < growListSize; i++) {
-            list = cons(i, list);
-        }
-        this.consList = list.reverse();
-        SizeOfProfiler.setRootObject(this.consList);
-    }
-
-    @Benchmark
-    public void grow_ConsList_reversed() {
-        ConsList<Integer> list = nil();
-        for (int i = growListSize - 1; i >= 0; i--) {
-            list = cons(i, list);
-        }
-        this.consList = list;
-        SizeOfProfiler.setRootObject(this.consList);
-    }
-
-    @Benchmark
-    public void grow_ArrayList() {
+    public void growArrayList() {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < growListSize; i++) {
             list.add(i);
@@ -192,7 +193,7 @@ public class ConsListBenchmark {
     }
 
     @Benchmark
-    public void grow_LinkedList() {
+    public void growLinkedList() {
         List<Integer> list = new LinkedList<>();
         for (int i = 0; i < growListSize; i++) {
             list.add(i);
@@ -202,7 +203,47 @@ public class ConsListBenchmark {
     }
 
     @Benchmark
-    public int iterate_ConsList() {
+    public void growConsList() {
+        ConsList<Integer> list = nil();
+        for (int i = 0; i < growListSize; i++) {
+            list = cons(i, list);
+        }
+        this.consList = list.reverse();
+        SizeOfProfiler.setRootObject(this.consList);
+    }
+
+    @Benchmark
+    public void growConsListReverseInputOrder() {
+        ConsList<Integer> list = nil();
+        for (int i = growListSize - 1; i >= 0; i--) {
+            list = cons(i, list);
+        }
+        this.consList = list;
+        SizeOfProfiler.setRootObject(this.consList);
+    }
+
+    @Benchmark
+    public void growIntConsList() {
+        IntConsList<Integer> list = nil();
+        for (int i = 0; i < growListSize; i++) {
+            list = intCons(i, list);
+        }
+        this.intConsList = list.intReverse();
+        SizeOfProfiler.setRootObject(this.intConsList);
+    }
+
+    @Benchmark
+    public void growIntConsListReverseInputOrder() {
+        IntConsList<Integer> list = nil();
+        for (int i = growListSize - 1; i >= 0; i--) {
+            list = intCons(i, list);
+        }
+        this.intConsList = list;
+        SizeOfProfiler.setRootObject(this.intConsList);
+    }
+
+    @Benchmark
+    public int iterateConsList() {
         int sum = 0;
         for (Integer i: consList) {
             sum += i;
@@ -215,7 +256,7 @@ public class ConsListBenchmark {
     }
 
     @Benchmark
-    public int iterate_ArrayList() {
+    public int iterateArrayList() {
         int sum = 0;
         for (Integer i: arrayList) {
             sum += i;
@@ -228,10 +269,24 @@ public class ConsListBenchmark {
     }
 
     @Benchmark
-    public int iterate_LinkedList() {
+    public int iterateLinkedList() {
         int sum = 0;
         for (Integer i: linkedList) {
             sum += i;
+        }
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.valueOf(sum));
+        }
+        SizeOfProfiler.setRootObject(null);
+        return sum;
+    }
+
+    @Benchmark
+    public int iterateIntConsList() {
+        int sum = 0;
+        PrimitiveIterator.OfInt iter = intConsList.intIterator();
+        while (iter.hasNext()) {
+            sum += iter.nextInt();
         }
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(String.valueOf(sum));
@@ -250,6 +305,10 @@ public class ConsListBenchmark {
 
     public List<Integer> linkedList() {
         return linkedList;
+    }
+
+    public ConsList<Integer> intConsList() {
+        return intConsList;
     }
 
     void setKlassListSize(int klassListSize) {
