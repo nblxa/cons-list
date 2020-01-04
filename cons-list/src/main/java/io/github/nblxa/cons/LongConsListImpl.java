@@ -4,6 +4,9 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.LongStream;
@@ -11,12 +14,12 @@ import java.util.stream.StreamSupport;
 
 @Immutable
 @ThreadSafe
-final class LongConsListImpl extends AbstractCollection<Long>
+public final class LongConsListImpl extends AbstractCollection<Long>
                              implements LongConsList<Long>, Serializable {
     private static final long serialVersionUID = 5261195696436478859L;
-    private final long head;
+    private long head;
     @NonNull
-    private final LongConsList<Long> tail;
+    private LongConsList<Long> tail;
 
     LongConsListImpl(long head, @NonNull LongConsList<Long> tail) {
         this.head = head;
@@ -154,5 +157,61 @@ final class LongConsListImpl extends AbstractCollection<Long>
             cons = cons.longTail();
             return next;
         }
+    }
+
+    /**
+     * Serialization to an ObjectOutputStream is implemented non-recursively in order
+     * to avoid the {@link StackOverflowError} on long lists.
+     *
+     * ConsList implementations are reversed before serializing. This way, one particular
+     * use case of serialization is optimized: write-once, read-many. For instance, this could be
+     * serialization on disk in order to save application state that can be restored multiple times.
+     *
+     * List length is calculated and stored in long value before serializing the list. Its size should
+     * be enough for all practical concerns. Lists whose size exceed the amount of values of the long
+     * type will take practically forever to iterate, not to mention the memory requirements.
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        LongConsList<Long> reversed = ConsList.nil();
+        LongConsList<Long> cons = this;
+        long length = 0L;
+        while (cons != Nil.INSTANCE) {
+            reversed = new LongConsListImpl(cons.longHead(), reversed);
+            cons = cons.longTail();
+            length++; // Can overflow but it is very unpractical to check.
+        }
+        out.writeLong(length);
+        long pos = 0L;
+        PrimitiveIterator.OfLong iter = reversed.longIterator();
+        while (iter.hasNext()) {
+            long elem = iter.nextLong();
+            try {
+                out.writeLong(elem);
+                pos++;
+            } catch (Exception e) {
+                throw new ConsSerializationException(
+                    "Could not serialize element at 0-based position: " +
+                        (length - pos - 1L), e);
+            }
+        }
+    }
+
+    /**
+     * De-serialize the ConsList from its reversed serialized representation.
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        LongConsList<Long> cons = ConsList.nil();
+        long length = in.readLong();
+        for (long l = length; l != 0; l--) {
+            try {
+                long elem = in.readLong();
+                cons = ConsList.longCons(elem, cons);
+            } catch (Exception e) {
+                throw new ConsSerializationException(
+                    "Could not de-serialize element at 0-based position: " + (l - 1), e);
+            }
+        }
+        this.head = cons.longHead();
+        this.tail = cons.longTail();
     }
 }

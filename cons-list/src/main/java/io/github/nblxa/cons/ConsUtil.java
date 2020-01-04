@@ -9,6 +9,11 @@ final class ConsUtil {
     }
 
     final static int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
+    final static String MSG_TAIL_IS_NULL = "tail is null";
+    final static String MSG_ITERABLE_IS_NULL = "iterable is null";
+    final static String MSG_NULL_CONCAT_ARG_AT_POS = "Null concat argument at position ";
+    final static String MSG_NULL_CONCAT_ARG_AT_POS_0 = MSG_NULL_CONCAT_ARG_AT_POS + "0";
+    final static String MSG_ARG_ARRAY_REST_IS_NULL = "Argument array rest is null";
     static int EMPTY_SIZE = 0;
 
     static <V, U> boolean haveEqualElements(ConsList<V> first, ConsList<U> second) {

@@ -3,10 +3,10 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cons-list&metric=alert_status)](https://sonarcloud.io/dashboard?id=cons-list)
 [![Coverage Status](https://coveralls.io/repos/github/nblxa/cons-list/badge.svg?branch=master)](https://coveralls.io/github/nblxa/cons-list?branch=master)
 
-# Just the Cons List and nothing else
+# Production-grade Cons List implementation
 
 `ConsList` is an immutable singly-linked list:
-[ConsList.java](cons-list/src/main/java/io/github/nblxa/ConsList.java).
+[ConsList.java](cons-list/src/main/java/io/github/nblxa/cons/ConsList.java).
 
 This reliable and performant version of singly-linked
 Cons List in Java implements the `java.util.Collection` interface, giving
@@ -35,7 +35,11 @@ Java 8 Streams support:
 Methods `equals(Object o)` and `hashCode()` are also implemented
 without recursion.
 
-Finally, the class is `Serializable`.
+Finally, the class is `Serializable`. The serialization and de-serialization
+operations are implemented using loops instead of recursion, thereby
+safeguarding against a `StackOverflowError`.
+
+---
 
 Cons List, due to its simplicity and immutability, is an ideal data
 structure for multi-threaded processing of ordered collections of data.
@@ -114,29 +118,47 @@ such as `ArrayList`.
 See [ConsListBenchmark.java](cons-list-jmh/src/main/java/io/github/nblxa/ConsListBenchmark.java).
 
 Specific problems like flattening a tree-like hierarchical structure can be
-solved more performantly with `ConsList`, however the trivial list-growth and
-iteration operations are more performant using `java.util.ArrayList`.
+solved more optimally with `ConsList`, however the trivial list-growth and
+iteration operations perform better using `java.util.ArrayList`.
+
+Specialized implementations for primitive types, like the `IntConsList`, 
+for instance, may outperform `ArrayList` in some benchmarks due
+to the lack of boxing. 
 
 Here are the benchmark results on the author's machine:
 
-Benchmark | Collection | Avg time, ms/op
---------- | ---------- | ----:
-Flatten a hierarchy | `io.github.nblxa.cons.ConsList` | 29,659
-Flatten a hierarchy | `java.util.ArrayList` | 78,018
-Flatten a hierarchy | `java.util.LinkedList` | 112,173
-Grow a list of integers | `io.github.nblxa.cons.IntConsList` | 6,767 [1]
-Grow a list of integers | `io.github.nblxa.cons.ConsList` | 22,137 [1]
-Grow a list of integers | `java.util.ArrayList` | 9,507
-Grow a list of integers | `java.util.LinkedList` | 14,763
-Iterate over a list of integers | `io.github.nblxa.cons.IntConsList` | 3,058
-Iterate over a list of integers | `io.github.nblxa.cons.ConsList` | 4,845
-Iterate over a list of integers | `java.util.ArrayList` | 1,989
-Iterate over a list of integers | `java.util.LinkedList` | 10,451
+### Benchmark: Flatten a hierarchy
 
-[1]: The values for `ConsList` and `IntConsList` assume creating the list with
+Collection | Avg time, ms/op
+---------- | ----:
+`io.github.nblxa.cons.ConsList` | 29,659
+`java.util.ArrayList` | 78,018
+`java.util.LinkedList` | 112,173
+
+### Benchmark: Grow a list of integers
+
+Collection | Avg time, ms/op
+---------- | ----:
+`io.github.nblxa.cons.IntConsList` | 6,767
+`io.github.nblxa.cons.ConsList` | 22,137
+`java.util.ArrayList` | 9,507
+`java.util.LinkedList` | 14,763
+
+_Note:_ The values for `ConsList` and `IntConsList` assume creating the list with
 the reversed order of input values compared to those for `ArrayList` and `LinkedList`.
 If the reversed order is not possible, a somewhat slower `reverse()` or `intReverse()`
 operation is required, adding one single list iteration and re-construction.
+
+### Benchmark: Iterate over a list of integers
+
+Collection | Avg time, ms/op
+---------- | ----:
+`io.github.nblxa.cons.IntConsList` | 3,058
+`io.github.nblxa.cons.ConsList` | 4,845
+`java.util.ArrayList` | 1,989
+`java.util.LinkedList` | 10,451
+
+### Running the benchmarks
 
 The benchmark is written with [JMH](https://openjdk.java.net/projects/code-tools/jmh/).
 To test the performance on your machine, build the project and run:
