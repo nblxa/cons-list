@@ -38,6 +38,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <spotbugs.version>4.0.0-beta4</spotbugs.version>
         <spotbugs.maven.plugin.version>3.1.12.2</spotbugs.maven.plugin.version>
         <junit.version>4.13</junit.version>
@@ -66,6 +67,8 @@
         <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
         <flatten.maven.plugin.version>1.1.0</flatten.maven.plugin.version>
         <versions.maven.plugin.version>2.7</versions.maven.plugin.version>
+        <git.commit.id.plugin.version>4.0.0</git.commit.id.plugin.version>
+        <reproducible.build.maven.plugin.version>0.11</reproducible.build.maven.plugin.version>
     </properties>
 
     <distributionManagement>
@@ -232,6 +235,24 @@
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>${versions.maven.plugin.version}</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>${git.commit.id.plugin.version}</version>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>io.github.zlika</groupId>
+                    <artifactId>reproducible-build-maven-plugin</artifactId>
+                    <version>${reproducible.build.maven.plugin.version}</version>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -269,6 +290,18 @@
                     <flattenMode>bom</flattenMode>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>${git.commit.id.plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>io.github.zlika</groupId>
+                <artifactId>reproducible-build-maven-plugin</artifactId>
+                <version>${reproducible.build.maven.plugin.version}</version>
+            </plugin>
         </plugins>
     </build>
 
@@ -304,6 +337,10 @@
                                     </goals>
                                 </execution>
                             </executions>
+                            <configuration>
+                                <notimestamp>true</notimestamp>
+                                <bottom><![CDATA[Fork me on <a href="https://github.com/nblxa/cons-list">Github</a>.]]></bottom>
+                            </configuration>
                         </plugin>
 
                         <plugin>
@@ -322,6 +359,70 @@
                                             <arg>--pinentry-mode</arg>
                                             <arg>loopback</arg>
                                         </gpgArguments>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <skip>false</skip>
+                            </configuration>
+                        </plugin>
+
+                        <plugin>
+                            <groupId>pl.project13.maven</groupId>
+                            <artifactId>git-commit-id-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>retrieve-git-info</id>
+                                    <phase>initialize</phase>
+                                    <goals>
+                                        <goal>revision</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <skip>false</skip>
+                                <injectAllReactorProjects>true</injectAllReactorProjects>
+                                <runOnlyOnce>true</runOnlyOnce>
+                                <skipPoms>false</skipPoms>
+                                <dateFormat>yyyyMMddHHmmss</dateFormat>
+                                <dateFormatTimeZone>UTC</dateFormatTimeZone>
+                            </configuration>
+                        </plugin>
+
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-jar-plugin</artifactId>
+                            <configuration>
+                                <archive>
+                                    <manifestEntries>
+                                        <!--suppress UnresolvedMavenProperty -->
+                                        <Last-Commit-Id>${git.commit.id}</Last-Commit-Id>
+                                        <!--suppress UnresolvedMavenProperty -->
+                                        <Last-Commit-Time>${git.commit.time}</Last-Commit-Time>
+                                        <Reproducible-Build>true</Reproducible-Build>
+                                    </manifestEntries>
+                                </archive>
+                            </configuration>
+                        </plugin>
+
+                        <plugin>
+                            <groupId>io.github.zlika</groupId>
+                            <artifactId>reproducible-build-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>strip-jaxb</id>
+                                    <goals>
+                                        <goal>strip-jaxb</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>strip-jar</id>
+                                    <goals>
+                                        <goal>strip-jar</goal>
+                                    </goals>
+                                    <configuration>
+                                        <!--suppress UnresolvedMavenProperty -->
+                                        <zipDateTime>${git.commit.time}</zipDateTime>
                                     </configuration>
                                 </execution>
                             </executions>
