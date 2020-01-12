@@ -14,6 +14,7 @@ final class ConsUtil {
     final static String MSG_NULL_CONCAT_ARG_AT_POS = "Null concat argument at position ";
     final static String MSG_NULL_CONCAT_ARG_AT_POS_0 = MSG_NULL_CONCAT_ARG_AT_POS + "0";
     final static String MSG_ARG_ARRAY_REST_IS_NULL = "Argument array rest is null";
+    final static String MSG_USE_SERIALIZATION_PROXY = "Use serialization proxy!";
     static int EMPTY_SIZE = 0;
 
     static <V, U> boolean haveEqualElements(ConsList<V> first, ConsList<U> second) {

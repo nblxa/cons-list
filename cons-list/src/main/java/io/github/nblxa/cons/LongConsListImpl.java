@@ -16,10 +16,10 @@ import java.util.stream.StreamSupport;
 @ThreadSafe
 public final class LongConsListImpl extends AbstractCollection<Long>
                              implements LongConsList<Long>, Serializable {
-    private static final long serialVersionUID = 5261195696436478859L;
-    private long head;
+    private static final long serialVersionUID = 8707561999221345162L;
+    private final long head;
     @NonNull
-    private LongConsList<Long> tail;
+    private final LongConsList<Long> tail;
 
     LongConsListImpl(long head, @NonNull LongConsList<Long> tail) {
         this.head = head;
@@ -159,59 +159,93 @@ public final class LongConsListImpl extends AbstractCollection<Long>
         }
     }
 
-    /**
-     * Serialization to an ObjectOutputStream is implemented non-recursively in order
-     * to avoid the {@link StackOverflowError} on long lists.
-     *
-     * ConsList implementations are reversed before serializing. This way, one particular
-     * use case of serialization is optimized: write-once, read-many. For instance, this could be
-     * serialization on disk in order to save application state that can be restored multiple times.
-     *
-     * List length is calculated and stored in long value before serializing the list. Its size should
-     * be enough for all practical concerns. Lists whose size exceed the amount of values of the long
-     * type will take practically forever to iterate, not to mention the memory requirements.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        LongConsList<Long> reversed = ConsList.nil();
-        LongConsList<Long> cons = this;
-        long length = 0L;
-        while (cons != Nil.INSTANCE) {
-            reversed = new LongConsListImpl(cons.longHead(), reversed);
-            cons = cons.longTail();
-            length++; // Can overflow but it is very unpractical to check.
-        }
-        out.writeLong(length);
-        long pos = 0L;
-        PrimitiveIterator.OfLong iter = reversed.longIterator();
-        while (iter.hasNext()) {
-            long elem = iter.nextLong();
-            try {
-                out.writeLong(elem);
-                pos++;
-            } catch (Exception e) {
-                throw new ConsSerializationException(
-                    "Could not serialize element at 0-based position: " +
-                        (length - pos - 1L), e);
-            }
-        }
+    private Object writeReplace() {
+        return new SerializationProxy(this);
+    }
+
+    private void readObject(ObjectInputStream in) {
+        throw new UnsupportedOperationException(ConsUtil.MSG_USE_SERIALIZATION_PROXY);
     }
 
     /**
-     * De-serialize the ConsList from its reversed serialized representation.
+     * Serialization proxy pattern.
+     *
+     * This makes sure instances of the LongConsListImpl class only get created by constructors,
+     * and its fields can be made final.
+     *
+     * @serial
      */
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        LongConsList<Long> cons = ConsList.nil();
-        long length = in.readLong();
-        for (long l = length; l != 0; l--) {
-            try {
-                long elem = in.readLong();
-                cons = ConsList.longCons(elem, cons);
-            } catch (Exception e) {
-                throw new ConsSerializationException(
-                    "Could not de-serialize element at 0-based position: " + (l - 1), e);
+    private static class SerializationProxy implements Serializable {
+        private static final long serialVersionUID = -5079309550033277177L;
+        private transient LongConsList<Long> list;
+
+        private SerializationProxy(LongConsList<Long> list) {
+            this.list = list;
+        }
+
+        /**
+         * Serialization to an ObjectOutputStream is implemented non-recursively in order
+         * to avoid the {@link StackOverflowError} on long lists.
+         *
+         * ConsList implementations are reversed before serializing. This way, one particular
+         * use case of serialization is optimized: write-once, read-many. For instance, this could be
+         * serialization on disk in order to save application state that can be restored multiple times.
+         *
+         * List length is calculated and stored in long value before serializing the list. Its size should
+         * be enough for all practical concerns. Lists whose size exceed the amount of values of the long
+         * type will take practically forever to iterate, not to mention the memory requirements.
+         */
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            out.defaultWriteObject();
+            LongConsList<Long> reversed = ConsList.nil();
+            LongConsList<Long> cons = list;
+            long length = 0L;
+            while (cons != Nil.INSTANCE) {
+                reversed = new LongConsListImpl(cons.longHead(), reversed);
+                cons = cons.longTail();
+                length++; // Can overflow but it is very unpractical to check.
+            }
+            out.writeLong(length);
+            long pos = 0L;
+            PrimitiveIterator.OfLong iter = reversed.longIterator();
+            while (iter.hasNext()) {
+                long elem = iter.nextLong();
+                try {
+                    out.writeLong(elem);
+                    pos++;
+                } catch (Exception e) {
+                    throw new ConsSerializationException(
+                        "Could not serialize element at 0-based position: " +
+                            (length - pos - 1L), e);
+                }
             }
         }
-        this.head = cons.longHead();
-        this.tail = cons.longTail();
+
+        /**
+         * De-serialize the ConsList from its reversed serialized representation.
+         */
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            LongConsList<Long> cons = ConsList.nil();
+            long length = in.readLong();
+            for (long l = length; l != 0; l--) {
+                try {
+                    long elem = in.readLong();
+                    cons = ConsList.longCons(elem, cons);
+                } catch (Exception e) {
+                    throw new ConsSerializationException(
+                        "Could not de-serialize element at 0-based position: " + (l - 1), e);
+                }
+            }
+            list = cons;
+        }
+
+        /**
+         * Serialization proxy pattern: resolve the proxy into the ConsList when de-serializing.
+         * @return the de-serialized ConsList.
+         */
+        private Object readResolve() {
+            return list;
+        }
     }
 }

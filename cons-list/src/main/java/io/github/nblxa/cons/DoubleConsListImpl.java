@@ -16,10 +16,10 @@ import java.util.stream.StreamSupport;
 @ThreadSafe
 public final class DoubleConsListImpl extends AbstractCollection<Double>
                              implements DoubleConsList<Double>, Serializable {
-    private static final double serialVersionUID = 112639795479064119L;
-    private double head;
+    private static final long serialVersionUID = 9118119119693211728L;
+    private final double head;
     @NonNull
-    private DoubleConsList<Double> tail;
+    private final DoubleConsList<Double> tail;
 
     DoubleConsListImpl(double head, @NonNull DoubleConsList<Double> tail) {
         this.head = head;
@@ -159,59 +159,93 @@ public final class DoubleConsListImpl extends AbstractCollection<Double>
         }
     }
 
-    /**
-     * Serialization to an ObjectOutputStream is implemented non-recursively in order
-     * to avoid the {@link StackOverflowError} on long lists.
-     *
-     * ConsList implementations are reversed before serializing. This way, one particular
-     * use case of serialization is optimized: write-once, read-many. For instance, this could be
-     * serialization on disk in order to save application state that can be restored multiple times.
-     *
-     * List length is calculated and stored in long value before serializing the list. Its size should
-     * be enough for all practical concerns. Lists whose size exceed the amount of values of the long
-     * type will take practically forever to iterate, not to mention the memory requirements.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        DoubleConsList<Double> reversed = ConsList.nil();
-        DoubleConsList<Double> cons = this;
-        long length = 0L;
-        while (cons != Nil.INSTANCE) {
-            reversed = new DoubleConsListImpl(cons.doubleHead(), reversed);
-            cons = cons.doubleTail();
-            length++; // Can overflow but it is very unpractical to check.
-        }
-        out.writeLong(length);
-        long pos = 0L;
-        PrimitiveIterator.OfDouble iter = reversed.doubleIterator();
-        while (iter.hasNext()) {
-            double elem = iter.nextDouble();
-            try {
-                out.writeDouble(elem);
-                pos++;
-            } catch (Exception e) {
-                throw new ConsSerializationException(
-                    "Could not serialize element at 0-based position: " +
-                        (length - pos - 1L), e);
-            }
-        }
+    private Object writeReplace() {
+        return new SerializationProxy(this);
+    }
+
+    private void readObject(ObjectInputStream in) {
+        throw new UnsupportedOperationException(ConsUtil.MSG_USE_SERIALIZATION_PROXY);
     }
 
     /**
-     * De-serialize the ConsList from its reversed serialized representation.
+     * Serialization proxy pattern.
+     *
+     * This makes sure instances of the DoubleConsListImpl class only get created by constructors,
+     * and its fields can be made final.
+     *
+     * @serial
      */
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        DoubleConsList<Double> cons = ConsList.nil();
-        long length = in.readLong();
-        for (long l = length; l != 0; l--) {
-            try {
-                double elem = in.readDouble();
-                cons = ConsList.doubleCons(elem, cons);
-            } catch (Exception e) {
-                throw new ConsSerializationException(
-                    "Could not de-serialize element at 0-based position: " + (l - 1), e);
+    private static class SerializationProxy implements Serializable {
+        private static final long serialVersionUID = -4567593809099627800L;
+        private transient DoubleConsList<Double> list;
+
+        private SerializationProxy(DoubleConsList<Double> list) {
+            this.list = list;
+        }
+
+        /**
+         * Serialization to an ObjectOutputStream is implemented non-recursively in order
+         * to avoid the {@link StackOverflowError} on long lists.
+         *
+         * ConsList implementations are reversed before serializing. This way, one particular
+         * use case of serialization is optimized: write-once, read-many. For instance, this could be
+         * serialization on disk in order to save application state that can be restored multiple times.
+         *
+         * List length is calculated and stored in long value before serializing the list. Its size should
+         * be enough for all practical concerns. Lists whose size exceed the amount of values of the long
+         * type will take practically forever to iterate, not to mention the memory requirements.
+         */
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            out.defaultWriteObject();
+            DoubleConsList<Double> reversed = ConsList.nil();
+            DoubleConsList<Double> cons = list;
+            long length = 0L;
+            while (cons != Nil.INSTANCE) {
+                reversed = new DoubleConsListImpl(cons.doubleHead(), reversed);
+                cons = cons.doubleTail();
+                length++; // Can overflow but it is very unpractical to check.
+            }
+            out.writeLong(length);
+            long pos = 0L;
+            PrimitiveIterator.OfDouble iter = reversed.doubleIterator();
+            while (iter.hasNext()) {
+                double elem = iter.nextDouble();
+                try {
+                    out.writeDouble(elem);
+                    pos++;
+                } catch (Exception e) {
+                    throw new ConsSerializationException(
+                        "Could not serialize element at 0-based position: " +
+                            (length - pos - 1L), e);
+                }
             }
         }
-        this.head = cons.doubleHead();
-        this.tail = cons.doubleTail();
+
+        /**
+         * De-serialize the ConsList from its reversed serialized representation.
+         */
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            DoubleConsList<Double> cons = ConsList.nil();
+            long length = in.readLong();
+            for (long l = length; l != 0; l--) {
+                try {
+                    double elem = in.readDouble();
+                    cons = ConsList.doubleCons(elem, cons);
+                } catch (Exception e) {
+                    throw new ConsSerializationException(
+                        "Could not de-serialize element at 0-based position: " + (l - 1), e);
+                }
+            }
+            list = cons;
+        }
+
+        /**
+         * Serialization proxy pattern: resolve the proxy into the ConsList when de-serializing.
+         * @return the de-serialized ConsList.
+         */
+        private Object readResolve() {
+            return list;
+        }
     }
 }
