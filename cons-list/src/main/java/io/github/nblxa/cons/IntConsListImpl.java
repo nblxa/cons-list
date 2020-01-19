@@ -175,7 +175,7 @@ public final class IntConsListImpl extends AbstractCollection<Integer>
      *
      * @serial
      */
-    private static class SerializationProxy implements Serializable {
+    private static final class SerializationProxy implements Serializable {
         private static final long serialVersionUID = 7879963871389736253L;
         private transient IntConsList<Integer> list;
 

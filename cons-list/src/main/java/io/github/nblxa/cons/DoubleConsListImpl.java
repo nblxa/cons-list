@@ -175,7 +175,7 @@ public final class DoubleConsListImpl extends AbstractCollection<Double>
      *
      * @serial
      */
-    private static class SerializationProxy implements Serializable {
+    private static final class SerializationProxy implements Serializable {
         private static final long serialVersionUID = -4567593809099627800L;
         private transient DoubleConsList<Double> list;
 

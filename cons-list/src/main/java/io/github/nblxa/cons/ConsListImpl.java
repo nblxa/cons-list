@@ -134,7 +134,7 @@ public final class ConsListImpl<E> extends AbstractCollection<E> implements Seri
      * @param <E> element type
      * @serial
      */
-    private static class SerializationProxy<E> implements Serializable {
+    private static final class SerializationProxy<E> implements Serializable {
         private static final long serialVersionUID = 865233672804256245L;
         private transient ConsList<E> list;
 

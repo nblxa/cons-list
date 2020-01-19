@@ -175,7 +175,7 @@ public final class LongConsListImpl extends AbstractCollection<Long>
      *
      * @serial
      */
-    private static class SerializationProxy implements Serializable {
+    private static final class SerializationProxy implements Serializable {
         private static final long serialVersionUID = -5079309550033277177L;
         private transient LongConsList<Long> list;
 
