@@ -117,7 +117,7 @@ public final class ConsListImpl<E> extends AbstractCollection<E> implements Seri
         }
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) {
         throw new UnsupportedOperationException(ConsUtil.MSG_USE_SERIALIZATION_PROXY);
     }
 
@@ -155,7 +155,6 @@ public final class ConsListImpl<E> extends AbstractCollection<E> implements Seri
          * type will take practically forever to iterate, not to mention the memory requirements.
          */
         private void writeObject(ObjectOutputStream out) throws IOException {
-            out.defaultWriteObject();
             ConsList<E> reversed = ConsList.nil();
             ConsList<E> cons = list;
             long length = 0L;
@@ -182,7 +181,6 @@ public final class ConsListImpl<E> extends AbstractCollection<E> implements Seri
          * De-serialize the ConsList from its reversed serialized representation.
          */
         private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-            in.defaultReadObject();
             ConsList<E> cons = ConsList.nil();
             long length = in.readLong();
             for (long l = length; l != 0; l--) {

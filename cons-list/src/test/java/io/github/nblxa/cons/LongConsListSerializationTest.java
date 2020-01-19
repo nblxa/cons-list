@@ -184,4 +184,33 @@ public class LongConsListSerializationTest {
             .hasSize(20_000)
             .startsWith(Long.MAX_VALUE, 1, 2, 3, 4);
     }
+
+
+    @Test
+    public void test_bogusIntConsList_java() throws IOException {
+        // LongConsListImpl serialized without the writeReplace method.
+        int[] ints = new int[] {
+            -84, -19, 0, 5, 115, 114, 0, 37, 105, 111, 46, 103, 105, 116, 104, 117, 98, 46, 110, 98,
+            108, 120, 97, 46, 99, 111, 110, 115, 46, 76, 111, 110, 103, 67, 111, 110, 115, 76, 105,
+            115, 116, 73, 109, 112, 108, 120, -41, 121, -128, -17, 71, 75, -118, 2, 0, 2, 74, 0, 4,
+            104, 101, 97, 100, 76, 0, 4, 116, 97, 105, 108, 116, 0, 35, 76, 105, 111, 47, 103, 105,
+            116, 104, 117, 98, 47, 110, 98, 108, 120, 97, 47, 99, 111, 110, 115, 47, 76, 111, 110,
+            103, 67, 111, 110, 115, 76, 105, 115, 116, 59, 120, 112, 0, 0, 0, 0, 0, 0, 0, 42, 115,
+            114, 0, 24, 105, 111, 46, 103, 105, 116, 104, 117, 98, 46, 110, 98, 108, 120, 97, 46,
+            99, 111, 110, 115, 46, 78, 105, 108, -60, 89, -55, -122, 102, 61, 35, 7, 2, 0, 0, 120,
+            112
+        };
+
+        byte[] bytes = new byte[ints.length];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) ints[i];
+        }
+        ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(bytes));
+
+        Throwable t = catchThrowable(is::readObject);
+        assertThat(t)
+            .isExactlyInstanceOf(UnsupportedOperationException.class)
+            .hasMessage("Use serialization proxy!")
+            .hasStackTraceContaining(LongConsListImpl.class.getCanonicalName());
+    }
 }

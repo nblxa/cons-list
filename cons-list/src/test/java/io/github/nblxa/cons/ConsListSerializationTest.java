@@ -199,4 +199,36 @@ public class ConsListSerializationTest {
             .hasSize(20_000)
             .startsWith(1, 2, 3, 4);
     }
+
+    @Test
+    public void test_bogusConsList_java() throws IOException {
+        // ConsListImpl serialized without the writeReplace method.
+        int[] ints = new int[] {
+            -84, -19, 0, 5, 115, 114, 0, 33, 105, 111, 46, 103, 105, 116, 104, 117, 98, 46, 110, 98,
+            108, 120, 97, 46, 99, 111, 110, 115, 46, 67, 111, 110, 115, 76, 105, 115, 116, 73, 109,
+            112, 108, -77, -38, -35, -35, 94, 22, 28, -26, 2, 0, 2, 76, 0, 4, 104, 101, 97, 100,
+            116, 0, 18, 76, 106, 97, 118, 97, 47, 108, 97, 110, 103, 47, 79, 98, 106, 101, 99, 116,
+            59, 76, 0, 4, 116, 97, 105, 108, 116, 0, 31, 76, 105, 111, 47, 103, 105, 116, 104, 117,
+            98, 47, 110, 98, 108, 120, 97, 47, 99, 111, 110, 115, 47, 67, 111, 110, 115, 76, 105,
+            115, 116, 59, 120, 112, 115, 114, 0, 17, 106, 97, 118, 97, 46, 108, 97, 110, 103, 46,
+            73, 110, 116, 101, 103, 101, 114, 18, -30, -96, -92, -9, -127, -121, 56, 2, 0, 1, 73, 0,
+            5, 118, 97, 108, 117, 101, 120, 114, 0, 16, 106, 97, 118, 97, 46, 108, 97, 110, 103, 46,
+            78, 117, 109, 98, 101, 114, -122, -84, -107, 29, 11, -108, -32, -117, 2, 0, 0, 120, 112,
+            0, 0, 0, 42, 115, 114, 0, 24, 105, 111, 46, 103, 105, 116, 104, 117, 98, 46, 110, 98,
+            108, 120, 97, 46, 99, 111, 110, 115, 46, 78, 105, 108, -60, 89, -55, -122, 102, 61, 35,
+            7, 2, 0, 0, 120, 112
+        };
+
+        byte[] bytes = new byte[ints.length];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) ints[i];
+        }
+        ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(bytes));
+
+        Throwable t = catchThrowable(is::readObject);
+        assertThat(t)
+            .isExactlyInstanceOf(UnsupportedOperationException.class)
+            .hasMessage("Use serialization proxy!")
+            .hasStackTraceContaining(ConsListImpl.class.getCanonicalName());
+    }
 }

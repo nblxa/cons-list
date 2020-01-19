@@ -196,7 +196,6 @@ public final class DoubleConsListImpl extends AbstractCollection<Double>
          * type will take practically forever to iterate, not to mention the memory requirements.
          */
         private void writeObject(ObjectOutputStream out) throws IOException {
-            out.defaultWriteObject();
             DoubleConsList<Double> reversed = ConsList.nil();
             DoubleConsList<Double> cons = list;
             long length = 0L;
@@ -225,7 +224,6 @@ public final class DoubleConsListImpl extends AbstractCollection<Double>
          * De-serialize the ConsList from its reversed serialized representation.
          */
         private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-            in.defaultReadObject();
             DoubleConsList<Double> cons = ConsList.nil();
             long length = in.readLong();
             for (long l = length; l != 0; l--) {

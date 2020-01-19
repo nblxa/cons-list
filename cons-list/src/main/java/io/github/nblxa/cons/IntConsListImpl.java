@@ -196,7 +196,6 @@ public final class IntConsListImpl extends AbstractCollection<Integer>
          * type will take practically forever to iterate, not to mention the memory requirements.
          */
         private void writeObject(ObjectOutputStream out) throws IOException {
-            out.defaultWriteObject();
             IntConsList<Integer> reversed = ConsList.nil();
             IntConsList<Integer> cons = list;
             long length = 0L;
@@ -225,7 +224,6 @@ public final class IntConsListImpl extends AbstractCollection<Integer>
          * De-serialize the ConsList from its reversed serialized representation.
          */
         private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-            in.defaultReadObject();
             IntConsList<Integer> cons = ConsList.nil();
             long length = in.readLong();
             for (long l = length; l != 0; l--) {
