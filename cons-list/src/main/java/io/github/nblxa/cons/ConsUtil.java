@@ -30,7 +30,7 @@ final class ConsUtil {
 
     static <V, U> boolean haveEqualElements(IntConsList<V> first, IntConsList<U> second) {
         while (first != Nil.INSTANCE && second != Nil.INSTANCE) {
-            if (!Objects.equals(first.head(), second.head())) {
+            if (first.intHead() != second.intHead()) {
                 return false;
             }
             first = first.intTail();
@@ -41,7 +41,7 @@ final class ConsUtil {
 
     static <V, U> boolean haveEqualElements(LongConsList<V> first, LongConsList<U> second) {
         while (first != Nil.INSTANCE && second != Nil.INSTANCE) {
-            if (!Objects.equals(first.head(), second.head())) {
+            if (first.longHead() != second.longHead()) {
                 return false;
             }
             first = first.longTail();
@@ -52,7 +52,7 @@ final class ConsUtil {
 
     static <V, U> boolean haveEqualElements(DoubleConsList<V> first, DoubleConsList<U> second) {
         while (first != Nil.INSTANCE && second != Nil.INSTANCE) {
-            if (!Objects.equals(first.head(), second.head())) {
+            if (Double.compare(first.doubleHead(), second.doubleHead()) != 0) {
                 return false;
             }
             first = first.doubleTail();
