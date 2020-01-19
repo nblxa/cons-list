@@ -202,11 +202,11 @@ public final class Nil<E> extends AbstractCollection<E>
 
     @Override
     public boolean equals(Object o) {
-        return this == o;
+        return o instanceof Nil;
     }
 
     /**
-     * Do not break the singleton pattern during standard Java de-serialization.
+     * Singleton instance control for deserialization.
      */
     private Object readResolve() {
         return INSTANCE;
