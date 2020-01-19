@@ -187,7 +187,7 @@ public class LongConsListSerializationTest {
 
 
     @Test
-    public void test_bogusIntConsList_java() throws IOException {
+    public void test_bogusLongConsList_java() throws IOException {
         // LongConsListImpl serialized without the writeReplace method.
         int[] ints = new int[] {
             -84, -19, 0, 5, 115, 114, 0, 37, 105, 111, 46, 103, 105, 116, 104, 117, 98, 46, 110, 98,
