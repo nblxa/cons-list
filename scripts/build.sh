@@ -21,7 +21,7 @@ fi
 
 ./mvnw jacoco:prepare-agent \
        install \
-       sonar:sonar -Dsonar.projectKey=cons-list \
        jacoco:report \
+       sonar:sonar -Dsonar.projectKey=cons-list \
        coveralls:report \
        -e -B $RELEASE_PROFILE

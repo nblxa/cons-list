@@ -183,4 +183,32 @@ public class DoubleConsListSerializationTest {
             .hasSize(20_000)
             .startsWith(1.1d, 2.1d, 3.1d, 4.1d);
     }
+
+    @Test
+    public void test_bogusDoubleConsList_java() throws IOException {
+        // DoubleConsListImpl serialized without the writeReplace method.
+        int[] ints = new int[] {
+            -84, -19, 0, 5, 115, 114, 0, 39, 105, 111, 46, 103, 105, 116, 104, 117, 98, 46, 110, 98,
+            108, 120, 97, 46, 99, 111, 110, 115, 46, 68, 111, 117, 98, 108, 101, 67, 111, 110, 115,
+            76, 105, 115, 116, 73, 109, 112, 108, 126, -118, 17, 7, -115, 2, -24, 80, 2, 0, 2, 68,
+            0, 4, 104, 101, 97, 100, 76, 0, 4, 116, 97, 105, 108, 116, 0, 37, 76, 105, 111, 47, 103,
+            105, 116, 104, 117, 98, 47, 110, 98, 108, 120, 97, 47, 99, 111, 110, 115, 47, 68, 111,
+            117, 98, 108, 101, 67, 111, 110, 115, 76, 105, 115, 116, 59, 120, 112, 64, 69, 12, -52,
+            -52, -52, -52, -51, 115, 114, 0, 24, 105, 111, 46, 103, 105, 116, 104, 117, 98, 46, 110,
+            98, 108, 120, 97, 46, 99, 111, 110, 115, 46, 78, 105, 108, -60, 89, -55, -122, 102, 61,
+            35, 7, 2, 0, 0, 120, 112
+        };
+
+        byte[] bytes = new byte[ints.length];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) ints[i];
+        }
+        ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(bytes));
+
+        Throwable t = catchThrowable(is::readObject);
+        assertThat(t)
+            .isExactlyInstanceOf(UnsupportedOperationException.class)
+            .hasMessage("Use serialization proxy!")
+            .hasStackTraceContaining(DoubleConsListImpl.class.getCanonicalName());
+    }
 }
