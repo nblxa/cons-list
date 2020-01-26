@@ -57,7 +57,7 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     static <V> ConsList<V> cons(@Nullable V head, @NonNull ConsList<V> tail) {
-        return new ConsListImpl<>(head, Objects.requireNonNull(tail, "tail is null"));
+        return new ConsListImpl<>(head, Objects.requireNonNull(tail, ConsUtil.MSG_TAIL_IS_NULL));
     }
 
     /**
@@ -111,7 +111,7 @@ public interface ConsList<E> extends Collection<E> {
     static <V, U extends V> ConsList<V> cons(@Nullable U head,
                                              @NonNull ConsList<? extends V> tail,
                                              @NonNull Class<V> klass) {
-        return (ConsList<V>) new ConsListImpl(head, Objects.requireNonNull(tail, "tail is null"));
+        return (ConsList<V>) new ConsListImpl(head, Objects.requireNonNull(tail, ConsUtil.MSG_TAIL_IS_NULL));
     }
 
     /**
@@ -190,7 +190,7 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     static <V> ConsList<V> consList(@NonNull Iterable<V> iterable) {
-        Objects.requireNonNull(iterable, "iterable is null");
+        Objects.requireNonNull(iterable, ConsUtil.MSG_ITERABLE_IS_NULL);
         if (iterable instanceof ConsList) {
             return (ConsList<V>) iterable;
         }
@@ -222,13 +222,13 @@ public interface ConsList<E> extends Collection<E> {
     @SafeVarargs
     static <V> ConsList<V> concat(@NonNull ConsList<V> first, @NonNull ConsList<V>... rest) {
         Objects.requireNonNull(first, "Null concat argument at position 0");
-        Objects.requireNonNull(rest, "Argument array rest is null");
+        Objects.requireNonNull(rest, ConsUtil.MSG_ARG_ARRAY_REST_IS_NULL);
         if (rest.length == 0) {
             return first;
         }
         ConsList<V> result = rest[rest.length - 1];
         if (result == null) {
-            throw new NullPointerException("Null concat argument at position " + rest.length);
+            throw new NullPointerException(ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS + rest.length);
         }
         for (int i = rest.length - 2; i >= -1; i--) {
             ConsList<V> cons;
@@ -236,7 +236,7 @@ public interface ConsList<E> extends Collection<E> {
                 cons = first;
             } else {
                 if (rest[i] == null) {
-                    throw new NullPointerException("Null concat argument at position " + (i + 1));
+                    throw new NullPointerException(ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS + (i + 1));
                 }
                 cons = rest[i].reverse();
             }
@@ -272,7 +272,7 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     static IntConsList<Integer> intCons(int head, @NonNull IntConsList<Integer> tail) {
-        return new IntConsListImpl(head, Objects.requireNonNull(tail, "tail is null"));
+        return new IntConsListImpl(head, Objects.requireNonNull(tail, ConsUtil.MSG_TAIL_IS_NULL));
     }
 
     /**
@@ -330,7 +330,7 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     static IntConsList<Integer> intConsList(@NonNull Iterable<Integer> iterable) {
-        Objects.requireNonNull(iterable, "iterable is null");
+        Objects.requireNonNull(iterable, ConsUtil.MSG_ITERABLE_IS_NULL);
         if (iterable instanceof IntConsList) {
             return (IntConsList<Integer>) iterable;
         }
@@ -360,14 +360,14 @@ public interface ConsList<E> extends Collection<E> {
     @NonNull
     @SafeVarargs
     static IntConsList<Integer> concat(@NonNull IntConsList<Integer> first, @NonNull IntConsList<Integer>... rest) {
-        Objects.requireNonNull(first, "Null concat argument at position 0");
-        Objects.requireNonNull(rest, "Argument array rest is null");
+        Objects.requireNonNull(first, ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS_0);
+        Objects.requireNonNull(rest, ConsUtil.MSG_ARG_ARRAY_REST_IS_NULL);
         if (rest.length == 0) {
             return first;
         }
         IntConsList<Integer> result = rest[rest.length - 1];
         if (result == null) {
-            throw new NullPointerException("Null concat argument at position " + rest.length);
+            throw new NullPointerException(ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS + rest.length);
         }
         for (int i = rest.length - 2; i >= -1; i--) {
             IntConsList<Integer> cons;
@@ -375,7 +375,7 @@ public interface ConsList<E> extends Collection<E> {
                 cons = first;
             } else {
                 if (rest[i] == null) {
-                    throw new NullPointerException("Null concat argument at position " + (i + 1));
+                    throw new NullPointerException(ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS + (i + 1));
                 }
                 cons = rest[i].intReverse();
             }
@@ -400,7 +400,7 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     static LongConsList<Long> longCons(long head, @NonNull LongConsList<Long> tail) {
-        return new LongConsListImpl(head, Objects.requireNonNull(tail, "tail is null"));
+        return new LongConsListImpl(head, Objects.requireNonNull(tail, ConsUtil.MSG_TAIL_IS_NULL));
     }
 
     /**
@@ -458,7 +458,7 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     static LongConsList<Long> longConsList(@NonNull Iterable<Long> iterable) {
-        Objects.requireNonNull(iterable, "iterable is null");
+        Objects.requireNonNull(iterable, ConsUtil.MSG_ITERABLE_IS_NULL);
         if (iterable instanceof LongConsList) {
             return (LongConsList<Long>) iterable;
         }
@@ -488,14 +488,14 @@ public interface ConsList<E> extends Collection<E> {
     @NonNull
     @SafeVarargs
     static LongConsList<Long> concat(@NonNull LongConsList<Long> first, @NonNull LongConsList<Long>... rest) {
-        Objects.requireNonNull(first, "Null concat argument at position 0");
-        Objects.requireNonNull(rest, "Argument array rest is null");
+        Objects.requireNonNull(first, ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS_0);
+        Objects.requireNonNull(rest, ConsUtil.MSG_ARG_ARRAY_REST_IS_NULL);
         if (rest.length == 0) {
             return first;
         }
         LongConsList<Long> result = rest[rest.length - 1];
         if (result == null) {
-            throw new NullPointerException("Null concat argument at position " + rest.length);
+            throw new NullPointerException(ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS + rest.length);
         }
         for (int i = rest.length - 2; i >= -1; i--) {
             LongConsList<Long> cons;
@@ -503,7 +503,7 @@ public interface ConsList<E> extends Collection<E> {
                 cons = first;
             } else {
                 if (rest[i] == null) {
-                    throw new NullPointerException("Null concat argument at position " + (i + 1));
+                    throw new NullPointerException(ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS + (i + 1));
                 }
                 cons = rest[i].longReverse();
             }
@@ -528,7 +528,7 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     static DoubleConsList<Double> doubleCons(double head, @NonNull DoubleConsList<Double> tail) {
-        return new DoubleConsListImpl(head, Objects.requireNonNull(tail, "tail is null"));
+        return new DoubleConsListImpl(head, Objects.requireNonNull(tail, ConsUtil.MSG_TAIL_IS_NULL));
     }
 
     /**
@@ -586,7 +586,7 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     static DoubleConsList<Double> doubleConsList(@NonNull Iterable<Double> iterable) {
-        Objects.requireNonNull(iterable, "iterable is null");
+        Objects.requireNonNull(iterable, ConsUtil.MSG_ITERABLE_IS_NULL);
         if (iterable instanceof DoubleConsList) {
             return (DoubleConsList<Double>) iterable;
         }
@@ -617,13 +617,13 @@ public interface ConsList<E> extends Collection<E> {
     @SafeVarargs
     static DoubleConsList<Double> concat(@NonNull DoubleConsList<Double> first, @NonNull DoubleConsList<Double>... rest) {
         Objects.requireNonNull(first, "Null concat argument at position 0");
-        Objects.requireNonNull(rest, "Argument array rest is null");
+        Objects.requireNonNull(rest, ConsUtil.MSG_ARG_ARRAY_REST_IS_NULL);
         if (rest.length == 0) {
             return first;
         }
         DoubleConsList<Double> result = rest[rest.length - 1];
         if (result == null) {
-            throw new NullPointerException("Null concat argument at position " + rest.length);
+            throw new NullPointerException(ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS + rest.length);
         }
         for (int i = rest.length - 2; i >= -1; i--) {
             DoubleConsList<Double> cons;
@@ -631,7 +631,7 @@ public interface ConsList<E> extends Collection<E> {
                 cons = first;
             } else {
                 if (rest[i] == null) {
-                    throw new NullPointerException("Null concat argument at position " + (i + 1));
+                    throw new NullPointerException(ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS + (i + 1));
                 }
                 cons = rest[i].doubleReverse();
             }
@@ -644,28 +644,28 @@ public interface ConsList<E> extends Collection<E> {
     }
 
     /**
-     * Returns the first element of the cons list.
+     * Returns the first element of the <tt>ConsList</tt>
      *
      * <p>Throws {@link NoSuchElementException} if the list is empty.
      *
-     * @return first element of the cons list
+     * @return first element of the list
      */
     E head();
 
     /**
-     * Returns another cons list containing the current list's elements after the first one.
+     * Returns another <tt>ConsList</tt> containing the current list's elements after the first one.
      *
      * <p>Throws {@link NoSuchElementException} if the list is empty.
      *
-     * @return elements of the cons list after the first one
+     * @return elements of the list after the first one
      */
     @NonNull
     ConsList<E> tail();
 
     /**
-     * Constructs a new cons list with the elements of the current one in the reverse order.
+     * Constructs a new <tt>ConsList</tt> with the elements of the current one in the reverse order.
      *
-     * @return a new cons list with elements in reversed order
+     * @return a new list with elements in reversed order
      */
     @NonNull
     ConsList<E> reverse();

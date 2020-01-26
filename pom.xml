@@ -399,9 +399,9 @@
                             <configuration>
                                 <archive>
                                     <manifestEntries>
-                                        <!--suppress UnresolvedMavenProperty -->
+                                        <!--suppress UnresolvedMavenProperty: set by git-commit-id-plugin -->
                                         <Last-Commit-Id>${git.commit.id}</Last-Commit-Id>
-                                        <!--suppress UnresolvedMavenProperty -->
+                                        <!--suppress UnresolvedMavenProperty: set by git-commit-id-plugin -->
                                         <Last-Commit-Time>${git.commit.time}</Last-Commit-Time>
                                         <Reproducible-Build>true</Reproducible-Build>
                                     </manifestEntries>
@@ -425,7 +425,7 @@
                                         <goal>strip-jar</goal>
                                     </goals>
                                     <configuration>
-                                        <!--suppress UnresolvedMavenProperty -->
+                                        <!--suppress UnresolvedMavenProperty: set by git-commit-id-plugin -->
                                         <zipDateTime>${git.commit.time}</zipDateTime>
                                     </configuration>
                                 </execution>
