@@ -15,7 +15,7 @@ import java.util.stream.LongStream;
  */
 @Immutable
 @ThreadSafe
-final class Nil<E> extends AbstractCollection<E>
+public final class Nil<E> extends AbstractCollection<E>
                    implements ConsList<E>, IntConsList<E>, LongConsList<E>, DoubleConsList<E>, Serializable {
     private static final long serialVersionUID = -4298182790270344441L;
     static final Nil<?> INSTANCE = new Nil<>();
@@ -202,13 +202,13 @@ final class Nil<E> extends AbstractCollection<E>
 
     @Override
     public boolean equals(Object o) {
-        return this == o;
+        return o instanceof Nil;
     }
 
     /**
-     * Do not break the singleton pattern during standard Java de-serialization.
+     * Singleton instance control for deserialization.
      */
-    protected Object readResolve() {
+    private Object readResolve() {
         return INSTANCE;
     }
 }
