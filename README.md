@@ -161,7 +161,12 @@ Collection | Avg time, ms/op
 ### Running the benchmarks
 
 The benchmark is written with [JMH](https://openjdk.java.net/projects/code-tools/jmh/).
-To test the performance on your machine, build the project and run:
+To test the performance on your machine, build the project:
+```bash
+./mvnw clean package
+```
+
+and the benchmarks run:
 ```bash
 java -jar cons-list-jmh/target/benchmarks.jar
 ```
