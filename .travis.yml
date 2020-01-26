@@ -37,7 +37,6 @@ deploy:
       repo: nblxa/cons-list
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^(master|test/testreleases|release/[0-9]+)$
-      tags: true
 
   - provider: script
     skip_cleanup: true
@@ -46,4 +45,4 @@ deploy:
       repo: nblxa/cons-list
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^(master|test/testreleases|release/[0-9]+)$
-      tags: true
+
