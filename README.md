@@ -55,7 +55,7 @@ and Streams API.
 <dependency>
     <groupId>io.github.nblxa</groupId>
     <artifactId>cons-list</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
