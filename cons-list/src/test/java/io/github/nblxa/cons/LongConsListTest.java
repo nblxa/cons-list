@@ -321,6 +321,41 @@ public class LongConsListTest {
     }
 
     @Test
+    public void map_producesExpectedResult() {
+        ConsList<Long> longs = longList(3L, 14L, 12L, 92L, 6L);
+        ConsList<Long> timesTwo = longs.map(d -> d * 2);
+        assertThat(timesTwo)
+            .containsExactly(6L, 28L, 24L, 184L, 12L);
+    }
+
+    @Test
+    public void map_isEager() {
+        List<String> events = new ArrayList<>();
+
+        longList(3L, 14L)
+            .map(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .map(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            });
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3", "Map 1 Element 14", "Map 2 Element 3", "Map 2 Element 14");
+    }
+
+    @Test
+    public void longMap_producesExpectedResult() {
+        LongConsList<Long> longs = longList(3L, 14L, 12L, 92L, 6L);
+        LongConsList<Long> timesTwo = longs.longMap(d -> d * 2);
+        assertThat(timesTwo)
+            .containsExactly(6L, 28L, 24L, 184L, 12L);
+    }
+
+    @Test
     public void longMap_isEager() {
         List<String> events = new ArrayList<>();
 

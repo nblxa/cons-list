@@ -163,55 +163,55 @@ public class NilTest {
     public void testReverse() {
         ConsList<?> nil = nil();
         assertThat(nil.reverse())
-            .isSameAs(nil);
+            .isEqualTo(nil);
     }
 
     @Test
     public void testIntReverse() {
         IntConsList<?> nil = nil();
         assertThat(nil.intReverse())
-            .isSameAs(nil);
+            .isEqualTo(nil);
     }
 
     @Test
     public void testLongReverse() {
         LongConsList<?> nil = nil();
         assertThat(nil.longReverse())
-            .isSameAs(nil);
+            .isEqualTo(nil);
     }
 
     @Test
     public void testDoubleReverse() {
         DoubleConsList<?> nil = nil();
         assertThat(nil.doubleReverse())
-            .isSameAs(nil);
+            .isEqualTo(nil);
     }
 
     @Test
     public void testMap() {
         ConsList<Integer> nil = nil();
         assertThat(nil.map(Object::toString))
-            .isSameAs(nil);
+            .isEqualTo(nil);
     }
 
     @Test
     public void testIntMap() {
         IntConsList<Integer> nil = nil();
         assertThat(nil.intMap(i -> i + 1))
-            .isSameAs(nil);
+            .isEqualTo(nil);
     }
 
     @Test
     public void testLongMap() {
         LongConsList<Long> nil = nil();
         assertThat(nil.longMap(i -> i + 1L))
-            .isSameAs(nil);
+            .isEqualTo(nil);
     }
 
     @Test
     public void testDoubleMap() {
         DoubleConsList<Double> nil = nil();
         assertThat(nil.doubleMap(i -> i + 1d))
-            .isSameAs(nil);
+            .isEqualTo(nil);
     }
 }
