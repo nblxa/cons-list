@@ -222,7 +222,7 @@ public interface ConsList<E> extends Collection<E> {
     @NonNull
     @SafeVarargs
     static <V> ConsList<V> concat(@NonNull ConsList<V> first, @NonNull ConsList<V>... rest) {
-        Objects.requireNonNull(first, "Null concat argument at position 0");
+        Objects.requireNonNull(first, ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS_0);
         Objects.requireNonNull(rest, ConsUtil.MSG_ARG_ARRAY_REST_IS_NULL);
         if (rest.length == 0) {
             return first;
@@ -617,7 +617,7 @@ public interface ConsList<E> extends Collection<E> {
     @NonNull
     @SafeVarargs
     static DoubleConsList<Double> concat(@NonNull DoubleConsList<Double> first, @NonNull DoubleConsList<Double>... rest) {
-        Objects.requireNonNull(first, "Null concat argument at position 0");
+        Objects.requireNonNull(first, ConsUtil.MSG_NULL_CONCAT_ARG_AT_POS_0);
         Objects.requireNonNull(rest, ConsUtil.MSG_ARG_ARRAY_REST_IS_NULL);
         if (rest.length == 0) {
             return first;

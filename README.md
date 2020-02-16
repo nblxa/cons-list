@@ -43,7 +43,7 @@ safeguarding against a `StackOverflowError`.
 
 Cons List, due to its simplicity and immutability, is an ideal data
 structure for multi-threaded processing of ordered collections of data.
-Direct implementations however, suffer from heavy recsive calls
+Direct implementations however, suffer from heavy recursive calls
 and may cause high stack memory consumption, if not more severe issues.
 This implementation fuses the power of the immutable cons list
 with the wide range of functionality offered by the Java Collections
@@ -113,7 +113,7 @@ ConsList<String> fruit = Arrays.stream(new String[] {"Apples", "Bananas", "Orang
 
 Being an immutable collection, `ConsList` lets one save resources on defensive
 copying where it would otherwise have been necessary for mutable collections,
-such as `ArrayList`.  
+such as `ArrayList`.
 
 See [ConsListBenchmark.java](cons-list-jmh/src/main/java/io/github/nblxa/ConsListBenchmark.java).
 
@@ -121,9 +121,9 @@ Specific problems like flattening a tree-like hierarchical structure can be
 solved more optimally with `ConsList`, however the trivial list-growth and
 iteration operations perform better using `java.util.ArrayList`.
 
-Specialized implementations for primitive types, like the `IntConsList`, 
+Specialized implementations for primitive types, like the `IntConsList`,
 for instance, may outperform `ArrayList` in some benchmarks due
-to the lack of boxing. 
+to the lack of boxing.
 
 Here are the benchmark results on the author's machine:
 

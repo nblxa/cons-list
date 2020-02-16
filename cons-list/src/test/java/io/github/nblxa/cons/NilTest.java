@@ -25,6 +25,7 @@ public class NilTest {
 
     @Test
     public void testSingleton() throws NoSuchMethodException {
+        @SuppressWarnings("rawtypes")
         Constructor<Nil> constructor = Nil.class.getDeclaredConstructor();
         boolean isAccessible = constructor.isAccessible();
         try {
@@ -95,7 +96,8 @@ public class NilTest {
     @Test
     public void testNilSpliterator() {
         Spliterator<?> spliter = nil().spliterator();
-        assertThat(spliter.getExactSizeIfKnown()).isEqualTo(0L);
+        assertThat(spliter.getExactSizeIfKnown())
+            .isEqualTo(0L);
     }
 
     @Test
@@ -107,13 +109,15 @@ public class NilTest {
     @Test
     public void testNilLongSpliterator() {
         Spliterator.OfLong spliter = nil().longSpliterator();
-        assertThat(spliter.getExactSizeIfKnown()).isEqualTo(0L);
+        assertThat(spliter.getExactSizeIfKnown())
+            .isEqualTo(0L);
     }
 
     @Test
     public void testNilDoubleSpliterator() {
         Spliterator.OfDouble spliter = nil().doubleSpliterator();
-        assertThat(spliter.getExactSizeIfKnown()).isEqualTo(0L);
+        assertThat(spliter.getExactSizeIfKnown())
+            .isEqualTo(0L);
     }
 
     @Test
@@ -121,7 +125,8 @@ public class NilTest {
         List<?> list = nil()
             .stream()
             .collect(Collectors.toList());
-        assertThat(list).isEmpty();
+        assertThat(list)
+            .isEmpty();
     }
 
     @Test
@@ -130,7 +135,8 @@ public class NilTest {
             .intStream()
             .boxed()
             .collect(Collectors.toList());
-        assertThat(list).isEmpty();
+        assertThat(list)
+            .isEmpty();
     }
 
     @Test
@@ -139,7 +145,8 @@ public class NilTest {
             .longStream()
             .boxed()
             .collect(Collectors.toList());
-        assertThat(list).isEmpty();
+        assertThat(list)
+            .isEmpty();
     }
 
     @Test
@@ -148,30 +155,63 @@ public class NilTest {
             .doubleStream()
             .boxed()
             .collect(Collectors.toList());
-        assertThat(list).isEmpty();
+        assertThat(list)
+            .isEmpty();
     }
 
     @Test
     public void testReverse() {
         ConsList<?> nil = nil();
-        assertThat(nil.reverse()).isEqualTo(nil);
+        assertThat(nil.reverse())
+            .isSameAs(nil);
     }
 
     @Test
     public void testIntReverse() {
         IntConsList<?> nil = nil();
-        assertThat(nil.intReverse()).isEqualTo(nil);
+        assertThat(nil.intReverse())
+            .isSameAs(nil);
     }
 
     @Test
     public void testLongReverse() {
         LongConsList<?> nil = nil();
-        assertThat(nil.longReverse()).isEqualTo(nil);
+        assertThat(nil.longReverse())
+            .isSameAs(nil);
     }
 
     @Test
     public void testDoubleReverse() {
         DoubleConsList<?> nil = nil();
-        assertThat(nil.doubleReverse()).isEqualTo(nil);
+        assertThat(nil.doubleReverse())
+            .isSameAs(nil);
+    }
+
+    @Test
+    public void testMap() {
+        ConsList<Integer> nil = nil();
+        assertThat(nil.map(Object::toString))
+            .isSameAs(nil);
+    }
+
+    @Test
+    public void testIntMap() {
+        IntConsList<Integer> nil = nil();
+        assertThat(nil.intMap(i -> i + 1))
+            .isSameAs(nil);
+    }
+
+    @Test
+    public void testLongMap() {
+        LongConsList<Long> nil = nil();
+        assertThat(nil.longMap(i -> i + 1L))
+            .isSameAs(nil);
+    }
+
+    @Test
+    public void testDoubleMap() {
+        DoubleConsList<Double> nil = nil();
+        assertThat(nil.doubleMap(i -> i + 1d))
+            .isSameAs(nil);
     }
 }

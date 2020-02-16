@@ -68,8 +68,7 @@ final class ConsUtil {
     static <E, T> ConsList<T> map(@NonNull ConsList<E> cons, @NonNull Function<? super E, ? extends T> mappingFunction) {
         ConsList<T> result = ConsList.nil();
         while (cons != Nil.INSTANCE) {
-            T t = mappingFunction.apply(cons.head());
-            result = new ConsListImpl<>(t, result);
+            result = new ConsListImpl<>(mappingFunction.apply(cons.head()), result);
             cons = cons.tail();
         }
         return result.reverse();

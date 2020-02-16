@@ -57,8 +57,7 @@ public final class DoubleConsListImpl extends AbstractCollection<Double>
         DoubleConsList<Double> result = ConsList.nil();
         DoubleConsList<Double> cons = this;
         while (cons != Nil.INSTANCE) {
-            double d = mapper.applyAsDouble(cons.doubleHead());
-            result = new DoubleConsListImpl(d, result);
+            result = new DoubleConsListImpl(mapper.applyAsDouble(cons.doubleHead()), result);
             cons = cons.doubleTail();
         }
         return result.doubleReverse();

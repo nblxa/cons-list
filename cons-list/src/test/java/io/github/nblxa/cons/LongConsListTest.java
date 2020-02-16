@@ -319,4 +319,45 @@ public class LongConsListTest {
             .hasNoCause()
             .hasMessage("Null concat argument at position 0");
     }
+
+    @Test
+    public void longMap_isEager() {
+        List<String> events = new ArrayList<>();
+
+        longList(3L, 14L)
+            .longMap(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .longMap(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            });
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3", "Map 1 Element 14", "Map 2 Element 3", "Map 2 Element 14");
+    }
+
+    @Test
+    public void longStreamMap_isLazy() {
+        List<String> events = new ArrayList<>();
+
+        longList(3L, 14L)
+            .longStream()
+            .map(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .map(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            })
+            .boxed()
+            .collect(ConsList.toConsCollector());
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3", "Map 2 Element 3", "Map 1 Element 14", "Map 2 Element 14");
+    }
 }

@@ -9,7 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
@@ -48,6 +50,18 @@ public final class IntConsListImpl extends AbstractCollection<Integer>
             cons = cons.intTail();
         }
         return result;
+    }
+
+    @NonNull
+    @Override
+    public IntConsList<Integer> intMap(@NonNull IntUnaryOperator mapper) {
+        IntConsList<Integer> result = ConsList.nil();
+        IntConsList<Integer> cons = this;
+        while (cons != Nil.INSTANCE) {
+            result = new IntConsListImpl(mapper.applyAsInt(cons.intHead()), result);
+            cons = cons.intTail();
+        }
+        return result.intReverse();
     }
 
     @NonNull

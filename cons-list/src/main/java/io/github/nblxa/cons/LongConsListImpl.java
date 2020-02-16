@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.LongUnaryOperator;
 import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
@@ -48,6 +49,36 @@ public final class LongConsListImpl extends AbstractCollection<Long>
             cons = cons.longTail();
         }
         return result;
+    }
+
+    @NonNull
+    @Override
+    public PrimitiveIterator.OfLong longIterator() {
+        return new LongConsIterator(this);
+    }
+
+    @NonNull
+    @Override
+    public Spliterator.OfLong longSpliterator() {
+        return Spliterators.spliteratorUnknownSize(longIterator(), ConsUtil.SPLITERATOR_CHARACTERISTICS);
+    }
+
+    @NonNull
+    @Override
+    public LongStream longStream() {
+        return StreamSupport.longStream(longSpliterator(), false);
+    }
+
+    @NonNull
+    @Override
+    public LongConsList<Long> longMap(@NonNull LongUnaryOperator mapper) {
+        LongConsList<Long> result = ConsList.nil();
+        LongConsList<Long> cons = this;
+        while (cons != Nil.INSTANCE) {
+            result = new LongConsListImpl(mapper.applyAsLong(cons.longHead()), result);
+            cons = cons.longTail();
+        }
+        return result.longReverse();
     }
 
     @NonNull
@@ -100,24 +131,6 @@ public final class LongConsListImpl extends AbstractCollection<Long>
     @Override
     public Spliterator<Long> spliterator() {
         return longSpliterator();
-    }
-
-    @NonNull
-    @Override
-    public PrimitiveIterator.OfLong longIterator() {
-        return new LongConsIterator(this);
-    }
-
-    @NonNull
-    @Override
-    public Spliterator.OfLong longSpliterator() {
-        return Spliterators.spliteratorUnknownSize(longIterator(), ConsUtil.SPLITERATOR_CHARACTERISTICS);
-    }
-
-    @NonNull
-    @Override
-    public LongStream longStream() {
-        return StreamSupport.longStream(longSpliterator(), false);
     }
 
     @Override
