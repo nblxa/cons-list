@@ -1,7 +1,10 @@
 package io.github.nblxa.cons;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import java.util.Objects;
 import java.util.Spliterator;
+import java.util.function.Function;
 
 final class ConsUtil {
     private ConsUtil() {
@@ -59,5 +62,16 @@ final class ConsUtil {
             second = second.doubleTail();
         }
         return first == Nil.INSTANCE && second == Nil.INSTANCE;
+    }
+
+    @NonNull
+    static <E, T> ConsList<T> map(@NonNull ConsList<E> cons, @NonNull Function<? super E, ? extends T> mappingFunction) {
+        ConsList<T> result = ConsList.nil();
+        while (cons != Nil.INSTANCE) {
+            T t = mappingFunction.apply(cons.head());
+            result = new ConsListImpl<>(t, result);
+            cons = cons.tail();
+        }
+        return result.reverse();
     }
 }

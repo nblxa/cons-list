@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
 
 @Immutable
 @ThreadSafe
@@ -44,6 +45,12 @@ public final class ConsListImpl<E> extends AbstractCollection<E> implements Seri
             cons = cons.tail();
         }
         return result;
+    }
+
+    @NonNull
+    @Override
+    public <T> ConsList<T> map(@NonNull Function<? super E, ? extends T> mappingFunction) {
+        return ConsUtil.map(this, mappingFunction);
     }
 
     @Override

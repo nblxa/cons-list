@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
@@ -65,6 +66,12 @@ public final class IntConsListImpl extends AbstractCollection<Integer>
     @Override
     public ConsList<Integer> reverse() {
         return intReverse();
+    }
+
+    @NonNull
+    @Override
+    public <T> ConsList<T> map(@NonNull Function<? super Integer, ? extends T> mappingFunction) {
+        return ConsUtil.map(this, mappingFunction);
     }
 
     @Override

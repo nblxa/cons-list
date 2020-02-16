@@ -6,6 +6,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -669,4 +670,17 @@ public interface ConsList<E> extends Collection<E> {
      */
     @NonNull
     ConsList<E> reverse();
+
+    /**
+     * Eager implementation of the <tt>map</tt> method that applies <tt>mappingFunction</tt>
+     * to all elements of the <tt>ConsList</tt>.
+     *
+     * The resulting new list has the same order of elements.
+     *
+     * @param mappingFunction the mapping function to be applied to all elements
+     * @param <T> new list&amp;s element type
+     * @return new resulting list
+     */
+    @NonNull
+    <T> ConsList<T> map(@NonNull Function<? super E, ? extends T> mappingFunction);
 }

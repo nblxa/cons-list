@@ -6,6 +6,7 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -42,6 +43,13 @@ public final class Nil<E> extends AbstractCollection<E>
     @Override
     public Nil<E> reverse() {
         return this;
+    }
+
+    @NonNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Nil<T> map(@NonNull Function<? super E, ? extends T> mappingFunction) {
+        return (Nil<T>) this;
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.StreamSupport;
 
@@ -65,6 +66,12 @@ public final class DoubleConsListImpl extends AbstractCollection<Double>
     @Override
     public ConsList<Double> reverse() {
         return doubleReverse();
+    }
+
+    @NonNull
+    @Override
+    public <T> ConsList<T> map(@NonNull Function<? super Double, ? extends T> mappingFunction) {
+        return ConsUtil.map(this, mappingFunction);
     }
 
     @Override

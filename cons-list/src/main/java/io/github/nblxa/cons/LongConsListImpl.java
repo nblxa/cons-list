@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
@@ -65,6 +66,12 @@ public final class LongConsListImpl extends AbstractCollection<Long>
     @Override
     public ConsList<Long> reverse() {
         return longReverse();
+    }
+
+    @NonNull
+    @Override
+    public <T> ConsList<T> map(@NonNull Function<? super Long, ? extends T> mappingFunction) {
+        return ConsUtil.map(this, mappingFunction);
     }
 
     @Override
