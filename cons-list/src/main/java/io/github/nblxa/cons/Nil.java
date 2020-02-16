@@ -6,6 +6,7 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -48,7 +49,7 @@ public final class Nil<E> extends AbstractCollection<E>
     @NonNull
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Nil<T> map(@NonNull Function<? super E, ? extends T> mappingFunction) {
+    public <T> Nil<T> map(@NonNull Function<? super E, ? extends T> mapper) {
         return (Nil<T>) this;
     }
 
@@ -156,6 +157,12 @@ public final class Nil<E> extends AbstractCollection<E>
     @NonNull
     @Override
     public DoubleConsList<E> doubleReverse() {
+        return this;
+    }
+
+    @NonNull
+    @Override
+    public DoubleConsList<E> doubleMap(@NonNull DoubleUnaryOperator mapper) {
         return this;
     }
 

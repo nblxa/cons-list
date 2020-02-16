@@ -70,8 +70,8 @@ public final class IntConsListImpl extends AbstractCollection<Integer>
 
     @NonNull
     @Override
-    public <T> ConsList<T> map(@NonNull Function<? super Integer, ? extends T> mappingFunction) {
-        return ConsUtil.map(this, mappingFunction);
+    public <T> ConsList<T> map(@NonNull Function<? super Integer, ? extends T> mapper) {
+        return ConsUtil.map(this, mapper);
     }
 
     @Override

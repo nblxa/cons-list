@@ -672,15 +672,15 @@ public interface ConsList<E> extends Collection<E> {
     ConsList<E> reverse();
 
     /**
-     * Eager implementation of the <tt>map</tt> method that applies <tt>mappingFunction</tt>
+     * Eager implementation of the <tt>map</tt> method that applies <tt>mapper</tt>
      * to all elements of the <tt>ConsList</tt>.
      *
      * The resulting new list has the same order of elements.
      *
-     * @param mappingFunction the mapping function to be applied to all elements
+     * @param mapper the mapping function to be applied to all elements
      * @param <T> new list&amp;s element type
      * @return new resulting list
      */
     @NonNull
-    <T> ConsList<T> map(@NonNull Function<? super E, ? extends T> mappingFunction);
+    <T> ConsList<T> map(@NonNull Function<? super E, ? extends T> mapper);
 }

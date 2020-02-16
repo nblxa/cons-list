@@ -49,8 +49,8 @@ public final class ConsListImpl<E> extends AbstractCollection<E> implements Seri
 
     @NonNull
     @Override
-    public <T> ConsList<T> map(@NonNull Function<? super E, ? extends T> mappingFunction) {
-        return ConsUtil.map(this, mappingFunction);
+    public <T> ConsList<T> map(@NonNull Function<? super E, ? extends T> mapper) {
+        return ConsUtil.map(this, mapper);
     }
 
     @Override

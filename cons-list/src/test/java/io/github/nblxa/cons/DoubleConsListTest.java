@@ -319,4 +319,53 @@ public class DoubleConsListTest {
             .hasNoCause()
             .hasMessage("Null concat argument at position 0");
     }
+
+    @Test
+    public void doubleMap_producesExpectedResult() {
+        DoubleConsList<Double> doubles = doubleList(3.1d, 14.1d, 12.1d, 92.1d, 6.1d);
+        DoubleConsList<Double> timesTwo = doubles.doubleMap(d -> d * 2);
+        assertThat(timesTwo)
+            .containsExactly(6.2d, 28.2d, 24.2d, 184.2d, 12.2d);
+    }
+
+    @Test
+    public void doubleMap_isEager() {
+        List<String> events = new ArrayList<>();
+
+        doubleList(3.1d, 14.1d)
+            .doubleMap(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .doubleMap(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            });
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3.1", "Map 1 Element 14.1", "Map 2 Element 3.1", "Map 2 Element 14.1");
+    }
+
+    @Test
+    public void doubleStreamMap_isLazy() {
+        List<String> events = new ArrayList<>();
+
+        doubleList(3.1d, 14.1d)
+            .doubleStream()
+            .map(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .map(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            })
+            .boxed()
+            .collect(ConsList.toConsCollector());
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3.1", "Map 2 Element 3.1", "Map 1 Element 14.1", "Map 2 Element 14.1");
+    }
 }

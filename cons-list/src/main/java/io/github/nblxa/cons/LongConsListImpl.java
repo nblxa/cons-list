@@ -70,8 +70,8 @@ public final class LongConsListImpl extends AbstractCollection<Long>
 
     @NonNull
     @Override
-    public <T> ConsList<T> map(@NonNull Function<? super Long, ? extends T> mappingFunction) {
-        return ConsUtil.map(this, mappingFunction);
+    public <T> ConsList<T> map(@NonNull Function<? super Long, ? extends T> mapper) {
+        return ConsUtil.map(this, mapper);
     }
 
     @Override

@@ -368,7 +368,7 @@ public class ConsListTest {
     public void map_isEager() {
         List<String> events = new ArrayList<>();
 
-        ConsList<Integer> integers = list(3, 14)
+        list(3, 14)
             .map(e -> {
                 events.add("Map 1 Element " + e);
                 return e;
@@ -387,7 +387,7 @@ public class ConsListTest {
     public void streamMap_isLazy() {
         List<String> events = new ArrayList<>();
 
-        ConsList<Integer> integers = list(3, 14)
+        list(3, 14)
             .stream()
             .map(e -> {
                 events.add("Map 1 Element " + e);
