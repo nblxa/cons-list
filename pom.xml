@@ -39,7 +39,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spotbugs.version>4.0.0</spotbugs.version>
+        <spotbugs.version>4.0.1</spotbugs.version>
         <spotbugs.maven.plugin.version>3.1.12.2</spotbugs.maven.plugin.version>
         <junit.version>4.13</junit.version>
         <assertj.version>3.15.0</assertj.version>
