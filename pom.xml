@@ -49,7 +49,7 @@
         <javac.target>1.8</javac.target>
         <jacoco.maven.plugin.version>0.8.5</jacoco.maven.plugin.version>
         <coveralls.maven.plugin.version>4.3.0</coveralls.maven.plugin.version>
-        <pitest.version>1.5.0</pitest.version>
+        <pitest.version>1.5.1</pitest.version>
         <jmh.version>1.23</jmh.version>
         <slf4j.simple.version>1.7.30</slf4j.simple.version>
         <sizeof.version>0.3.0</sizeof.version>
