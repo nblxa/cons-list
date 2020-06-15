@@ -43,7 +43,7 @@
         <spotbugs.maven.plugin.version>4.0.0</spotbugs.maven.plugin.version>
         <junit.version>4.13</junit.version>
         <assertj.version>3.16.1</assertj.version>
-        <equalsverifier.version>3.3</equalsverifier.version>
+        <equalsverifier.version>3.4</equalsverifier.version>
         <jackson.version>2.10.0</jackson.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <javac.target>1.8</javac.target>
