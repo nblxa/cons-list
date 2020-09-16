@@ -47,7 +47,7 @@
         <jackson.version>2.10.0</jackson.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <javac.target>1.8</javac.target>
-        <jacoco.maven.plugin.version>0.8.5</jacoco.maven.plugin.version>
+        <jacoco.maven.plugin.version>0.8.6</jacoco.maven.plugin.version>
         <coveralls.maven.plugin.version>4.3.0</coveralls.maven.plugin.version>
         <pitest.version>1.5.2</pitest.version>
         <jmh.version>1.23</jmh.version>
