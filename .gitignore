@@ -32,3 +32,5 @@ hs_err_pid*
 
 # Maven versions plugin backup
 **/*.versionsBackup
+
+.DS_Store

@@ -49,6 +49,7 @@
         <javac.target>1.8</javac.target>
         <jacoco.maven.plugin.version>0.8.5</jacoco.maven.plugin.version>
         <coveralls.maven.plugin.version>4.3.0</coveralls.maven.plugin.version>
+        <jaxb.api.version>2.3.1</jaxb.api.version>
         <pitest.version>1.5.2</pitest.version>
         <jmh.version>1.23</jmh.version>
         <slf4j.simple.version>1.7.30</slf4j.simple.version>
@@ -127,6 +128,13 @@
                     <groupId>org.eluder.coveralls</groupId>
                     <artifactId>coveralls-maven-plugin</artifactId>
                     <version>${coveralls.maven.plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>javax.xml.bind</groupId>
+                            <artifactId>jaxb-api</artifactId>
+                            <version>${jaxb.api.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
 
                 <plugin>
