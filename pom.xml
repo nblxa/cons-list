@@ -51,7 +51,7 @@
         <coveralls.maven.plugin.version>4.3.0</coveralls.maven.plugin.version>
         <jaxb.api.version>2.3.1</jaxb.api.version>
         <pitest.version>1.5.2</pitest.version>
-        <jmh.version>1.23</jmh.version>
+        <jmh.version>1.32</jmh.version>
         <slf4j.simple.version>1.7.30</slf4j.simple.version>
         <sizeof.version>0.3.0</sizeof.version>
 
