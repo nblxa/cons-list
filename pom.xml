@@ -44,7 +44,7 @@
         <junit.version>4.13</junit.version>
         <assertj.version>3.19.0</assertj.version>
         <equalsverifier.version>3.4.2</equalsverifier.version>
-        <jackson.version>2.10.0</jackson.version>
+        <jackson.version>2.10.5.1</jackson.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <javac.target>1.8</javac.target>
         <jacoco.maven.plugin.version>0.8.5</jacoco.maven.plugin.version>
