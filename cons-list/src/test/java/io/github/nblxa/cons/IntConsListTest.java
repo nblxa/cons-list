@@ -319,4 +319,80 @@ public class IntConsListTest {
             .hasNoCause()
             .hasMessage("Null concat argument at position 0");
     }
+
+    @Test
+    public void map_producesExpectedResult() {
+        ConsList<Integer> integers = intList(3, 14, 12, 92, 6);
+        ConsList<Integer> timesTwo = integers.map(d -> d * 2);
+        assertThat(timesTwo)
+            .containsExactly(6, 28, 24, 184, 12);
+    }
+
+    @Test
+    public void map_isEager() {
+        List<String> events = new ArrayList<>();
+
+        intList(3, 14)
+            .map(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .map(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            });
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3", "Map 1 Element 14", "Map 2 Element 3", "Map 2 Element 14");
+    }
+
+    @Test
+    public void intMap_producesExpectedResult() {
+        IntConsList<Integer> integers = intList(3, 14, 12, 92, 6);
+        IntConsList<Integer> timesTwo = integers.intMap(d -> d * 2);
+        assertThat(timesTwo)
+            .containsExactly(6, 28, 24, 184, 12);
+    }
+
+    @Test
+    public void intMap_isEager() {
+        List<String> events = new ArrayList<>();
+
+        intList(3, 14)
+            .intMap(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .intMap(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            });
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3", "Map 1 Element 14", "Map 2 Element 3", "Map 2 Element 14");
+    }
+
+    @Test
+    public void intStreamMap_isLazy() {
+        List<String> events = new ArrayList<>();
+
+        intList(3, 14)
+            .intStream()
+            .map(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .map(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            })
+            .boxed()
+            .collect(ConsList.toConsCollector());
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3", "Map 2 Element 3", "Map 1 Element 14", "Map 2 Element 14");
+    }
 }

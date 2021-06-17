@@ -7,6 +7,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.NoSuchElementException;
 import java.util.PrimitiveIterator;
 import java.util.Spliterator;
+import java.util.function.LongUnaryOperator;
 import java.util.stream.LongStream;
 
 @Immutable
@@ -63,4 +64,16 @@ public interface LongConsList<E> extends ConsList<E> {
      */
     @NonNull
     LongStream longStream();
+
+    /**
+     * Eager implementation of the <tt>map</tt> method that applies <tt>mapper</tt>
+     * to all elements of the <tt>LongConsList</tt>.
+     *
+     * The resulting new list has the same order of elements.
+     *
+     * @param mapper the mapping function to be applied to all elements
+     * @return new resulting list
+     */
+    @NonNull
+    LongConsList<E> longMap(@NonNull LongUnaryOperator mapper);
 }

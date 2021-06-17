@@ -6,6 +6,10 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongUnaryOperator;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -42,6 +46,13 @@ public final class Nil<E> extends AbstractCollection<E>
     @Override
     public Nil<E> reverse() {
         return this;
+    }
+
+    @NonNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Nil<T> map(@NonNull Function<? super E, ? extends T> mapper) {
+        return (Nil<T>) this;
     }
 
     @Override
@@ -89,6 +100,12 @@ public final class Nil<E> extends AbstractCollection<E>
         return IntStream.empty();
     }
 
+    @NonNull
+    @Override
+    public IntConsList<E> intMap(@NonNull IntUnaryOperator mapper) {
+        return this;
+    }
+
     @Override
     public long longHead() {
         throw new NoSuchElementException();
@@ -134,6 +151,12 @@ public final class Nil<E> extends AbstractCollection<E>
         return LongStream.empty();
     }
 
+    @NonNull
+    @Override
+    public LongConsList<E> longMap(@NonNull LongUnaryOperator mapper) {
+        return this;
+    }
+
     @Override
     public double doubleHead() {
         throw new NoSuchElementException();
@@ -177,6 +200,12 @@ public final class Nil<E> extends AbstractCollection<E>
     @Override
     public DoubleStream doubleStream() {
         return DoubleStream.empty();
+    }
+
+    @NonNull
+    @Override
+    public DoubleConsList<E> doubleMap(@NonNull DoubleUnaryOperator mapper) {
+        return this;
     }
 
     @Override

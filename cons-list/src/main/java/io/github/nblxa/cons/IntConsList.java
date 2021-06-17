@@ -7,6 +7,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.NoSuchElementException;
 import java.util.PrimitiveIterator;
 import java.util.Spliterator;
+import java.util.function.IntUnaryOperator;
 import java.util.stream.IntStream;
 
 @Immutable
@@ -63,4 +64,16 @@ public interface IntConsList<E> extends ConsList<E> {
      */
     @NonNull
     IntStream intStream();
+
+    /**
+     * Eager implementation of the <tt>map</tt> method that applies <tt>mapper</tt>
+     * to all elements of the <tt>IntConsList</tt>.
+     *
+     * The resulting new list has the same order of elements.
+     *
+     * @param mapper the mapping function to be applied to all elements
+     * @return new resulting list
+     */
+    @NonNull
+    IntConsList<E> intMap(@NonNull IntUnaryOperator mapper);
 }

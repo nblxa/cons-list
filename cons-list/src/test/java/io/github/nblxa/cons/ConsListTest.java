@@ -355,4 +355,52 @@ public class ConsListTest {
             }
         }
     }
+
+    @Test
+    public void map_producesExpectedResult() {
+        ConsList<Integer> integers = list(3, 14, 12, 92, 6);
+        ConsList<String> strings = integers.map(Object::toString);
+        assertThat(strings)
+            .containsExactly("3", "14", "12", "92", "6");
+    }
+
+    @Test
+    public void map_isEager() {
+        List<String> events = new ArrayList<>();
+
+        list(3, 14)
+            .map(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .map(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            });
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3", "Map 1 Element 14", "Map 2 Element 3", "Map 2 Element 14");
+    }
+
+    @Test
+    public void streamMap_isLazy() {
+        List<String> events = new ArrayList<>();
+
+        list(3, 14)
+            .stream()
+            .map(e -> {
+                events.add("Map 1 Element " + e);
+                return e;
+            })
+            .map(e -> {
+                events.add("Map 2 Element " + e);
+                return e;
+            })
+            .collect(ConsList.toConsCollector());
+
+        assertThat(events)
+            .containsExactly(
+                "Map 1 Element 3", "Map 2 Element 3", "Map 1 Element 14", "Map 2 Element 14");
+    }
 }

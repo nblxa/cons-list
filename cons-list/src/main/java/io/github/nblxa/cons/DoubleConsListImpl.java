@@ -9,6 +9,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.StreamSupport;
 
@@ -51,6 +53,18 @@ public final class DoubleConsListImpl extends AbstractCollection<Double>
 
     @NonNull
     @Override
+    public DoubleConsList<Double> doubleMap(@NonNull DoubleUnaryOperator mapper) {
+        DoubleConsList<Double> result = ConsList.nil();
+        DoubleConsList<Double> cons = this;
+        while (cons != Nil.INSTANCE) {
+            result = new DoubleConsListImpl(mapper.applyAsDouble(cons.doubleHead()), result);
+            cons = cons.doubleTail();
+        }
+        return result.doubleReverse();
+    }
+
+    @NonNull
+    @Override
     public Double head() {
         return head;
     }
@@ -65,6 +79,12 @@ public final class DoubleConsListImpl extends AbstractCollection<Double>
     @Override
     public ConsList<Double> reverse() {
         return doubleReverse();
+    }
+
+    @NonNull
+    @Override
+    public <T> ConsList<T> map(@NonNull Function<? super Double, ? extends T> mapper) {
+        return ConsUtil.map(this, mapper);
     }
 
     @Override
